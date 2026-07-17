@@ -1,4 +1,5 @@
 CREATE OR REPLACE VIEW analytics_mart.vw_area_ativa_mes AS
+
 WITH params AS (
     SELECT date_trunc('month'::text, CURRENT_DATE - '3 years'::interval)::date AS min_month,
         date_trunc('month'::text, CURRENT_DATE::timestamp with time zone)::date AS max_month
@@ -91,7 +92,7 @@ WITH params AS (
 SELECT
     amv.id_property,
     amv.property_name,
-    amv.month_start,
+    amv.month_start as reference_month,
     amv.month_end,
 
     SUM(amv.hectares_owned) AS hectares_propria,
@@ -124,8 +125,8 @@ FROM area_month_value amv
 GROUP BY
     amv.id_property,
     amv.property_name,
-    amv.month_start,
+    amv.reference_month,
     amv.month_end
 ORDER BY
     amv.id_property,
-    amv.month_start;
+    amv.reference_month;

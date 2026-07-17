@@ -8,7 +8,7 @@ CREATE OR REPLACE VIEW analytics_mart.vw_asset_payment_history_monthly AS
 SELECT
     id_property,
     reference_month,
-
+    
     COALESCE(
         SUM(monthly_depreciation) FILTER (
             WHERE LOWER(TRIM(classification)) = 'benfeitorias'

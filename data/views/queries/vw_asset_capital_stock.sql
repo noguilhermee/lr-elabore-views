@@ -11,7 +11,8 @@ WITH asset_months AS (
         a.id_asset,
         a.id_property,
         a.name AS asset_name,
-
+        a.acquired_at,
+        
         a.id_classification,
         c.name AS classification,
 
@@ -127,8 +128,9 @@ SELECT
     id_classification,                 -- ID da classificação
     classification,                    -- Classificação do patrimônio
     asset_name,                        -- Nome do patrimônio
+    acquired_at,
     reference_month,                   -- Mês de referência
-
+    
     quantity,                          -- Quantidade do bem
     acquisition_total_value,           -- Valor total original de aquisição
     current_unit_value,                -- Valor unitário vigente, com revisão

@@ -27,8 +27,9 @@ payment_history AS (
         cs.id_classification,
         cs.classification,
         cs.asset_name,
+        cs.acquired_at,
         cs.reference_month,
-
+        
         cs.acquisition_total_value,
         cs.down_payment,
         cs.gross_capital_stock,
@@ -79,6 +80,7 @@ SELECT
     id_classification,                  -- ID da classificação
     classification,                     -- Classificação do patrimônio
     asset_name,                         -- Nome do patrimônio
+    acquired_at,                    
     reference_month,                    -- Mês de referência
     
     gross_capital_stock,                -- Estoque bruto de capital
@@ -94,5 +96,8 @@ SELECT
         2
     ) AS monthly_average_capital_stock  -- Capital pago dividido por 24
 
-FROM payment_calculation;
+FROM payment_calculation
+
+WHERE reference_month >= DATE '2025-01-01'
+
 limit 1000;
