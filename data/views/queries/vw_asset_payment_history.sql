@@ -96,8 +96,4 @@ SELECT
         2
     ) AS monthly_average_capital_stock  -- Capital pago dividido por 24
 
-FROM payment_calculation
-
-WHERE reference_month >= DATE '2025-01-01'
-
-limit 1000;
+FROM payment_calculation;

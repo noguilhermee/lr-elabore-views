@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/c/Users/analy/anaconda3/python test_harness3.py)",
+      "Bash(/c/Users/analy/anaconda3/python -c ' *)"
+    ]
+  }
+}
