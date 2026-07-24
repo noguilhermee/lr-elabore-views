@@ -1,0 +1,23 @@
+SELECT "Assets".id_asset,
+    "Assets".id_property,
+    "Assets".id_classification,
+    "Assets".id_type,
+    "Assets".name,
+    "Assets".quantity,
+    "Assets".acquired_at,
+    "Assets".value,
+    "Assets".corrected,
+    "Assets".finished_at,
+    "Assets".service_life,
+    "Assets".installment,
+    "Assets".is_active,
+    "Assets".created_at,
+    "Assets".updated_at,
+    "Assets".down_payment,
+    "Assets".interest_rate,
+    "Assets".installment_yearly,
+    "Assets".is_in_construction,
+    "Assets".depreciation_starts_at,
+    "Assets".activity_usage_percent
+    
+FROM "Assets";
