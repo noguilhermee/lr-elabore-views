@@ -1,3 +1,28 @@
+/*
+VIEW: analytics_mart.vw_area_history
+
+Finalidade:
+Gera o histórico mensal detalhado de cada área rural desde janeiro de 2025,
+informando sua vigência, quantidade de hectares e valor da terra aplicável
+em cada mês.
+
+Granularidade:
+Uma linha por área e mês.
+
+Regras principais:
+- Gera os meses entre 01/01/2025 e o mês atual.
+- Considera a vigência da área com base em started_at e finished_at.
+- Recupera o registro mais recente do histórico de valor da terra disponível
+  até o final de cada mês.
+- Utiliza o valor atual da área somente quando ela não possui nenhum registro
+  na tabela AreaLandValueHistory.
+- Identifica áreas de APP ou reserva por meio do id_area_usage.
+
+Forma de consulta:
+SELECT *
+FROM analytics_mart.vw_area_history;
+*/
+
 WITH params AS (
         SELECT '2025-01-01'::date AS min_month,
         date_trunc('month'::text, CURRENT_DATE::timestamp with time zone)::date AS max_month

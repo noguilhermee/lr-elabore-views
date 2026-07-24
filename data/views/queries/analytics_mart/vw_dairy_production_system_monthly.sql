@@ -1,3 +1,32 @@
+/*
+VIEW: analytics_mart.vw_dairy_production_system_monthly
+
+Finalidade:
+Classifica mensalmente o sistema predominante de produção de leite utilizado
+por cada propriedade.
+
+Granularidade:
+Uma linha por propriedade e mês.
+
+Sistemas avaliados:
+- COMPOST_BARN
+- FREE_STALL
+- SEMI_CONFINED
+- PASTURE
+- UNSTRUCTURED_CONFINMENT
+
+Regras principais:
+- Considera apenas registros da categoria LACTATION.
+- Expande cada registro para todos os meses de sua vigência.
+- Quando existem vários registros no mesmo mês, seleciona o mais recente.
+- Classifica como predominante o sistema que possui o maior percentual.
+- Retorna MIXED quando dois ou mais sistemas possuem o mesmo maior percentual.
+
+Forma de consulta:
+SELECT *
+FROM analytics_mart.vw_dairy_production_system_monthly;
+*/
+
 WITH expanded_months AS (
         SELECT dp.id_dairy,
             dp.id_property,

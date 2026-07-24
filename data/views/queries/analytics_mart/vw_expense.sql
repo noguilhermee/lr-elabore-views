@@ -1,3 +1,36 @@
+/*
+VIEW: analytics_mart.vw_expense
+
+Finalidade:
+Consolida mensalmente as despesas gerais de cada propriedade, distribuindo
+os valores lançados em diferentes categorias econômicas e operacionais.
+
+Granularidade:
+Uma linha por propriedade e mês.
+
+Principais grupos consolidados:
+- Despesas gerais e administração
+- Arrendamento e assistência técnica
+- Compra de animais e terras
+- Consertos e reparos
+- Juros, impostos e taxas
+- Hormônios, medicamentos e vacinas
+- Reprodução e sucedâneo
+- Material de ordenha
+- Leite destinado aos bezerros
+- Energia e combustíveis
+
+Regras principais:
+- Considera somente lançamentos ativos.
+- Exclui despesas da aba FEEDING.
+- Exclui operações de armazenamento identificadas como ESTOCAR.
+- Soma os valores de acordo com a aba e o código de cada lançamento.
+
+Forma de consulta:
+SELECT *
+FROM analytics_mart.vw_expense;
+*/
+
 SELECT "ExpenseEntry".id_property,
     date_trunc('month'::text, "ExpenseEntry".reference_month)::date AS reference_month,
     sum(

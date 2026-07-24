@@ -1,3 +1,32 @@
+/*
+VIEW: analytics_mart.vw_area_month
+
+Finalidade:
+Consolida mensalmente as áreas vigentes de cada propriedade, separando hectares
+próprios, arrendados, destinados à atividade e destinados à APP ou reserva.
+Também calcula os valores médios ponderados da terra para cada classificação.
+
+Granularidade:
+Uma linha por propriedade e mês.
+
+Regras principais:
+- Abrange o período equivalente aos últimos três anos até o mês atual.
+- Considera a vigência de cada área com base nas datas de início e término.
+- Combina o valor cadastrado na área com seu histórico de alterações.
+- Prioriza o histórico quando existem registros na mesma data.
+- Calcula o valor médio da terra ponderado pela quantidade de hectares.
+- Retorna o mês na coluna reference_month.
+
+Observação:
+Possui lógica praticamente equivalente à view vw_area_ativa_mes. A principal
+diferença visível é o nome da coluna mensal: reference_month nesta view e
+month_start na vw_area_ativa_mes.
+
+Forma de consulta:
+SELECT *
+FROM analytics_mart.vw_area_month;
+*/
+
 WITH params AS (
         SELECT date_trunc('month'::text, CURRENT_DATE - '3 years'::interval)::date AS min_month,
         date_trunc('month'::text, CURRENT_DATE::timestamp with time zone)::date AS max_month

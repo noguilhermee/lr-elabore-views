@@ -1,3 +1,27 @@
+/*
+VIEW: analytics_mart.vw_asset_payment_history_monthly
+
+Finalidade atual:
+Disponibiliza os dados cadastrais e financeiros dos ativos, incluindo valor,
+entrada, parcelas, taxa de juros, vida útil, datas e situação do ativo.
+
+Granularidade:
+Uma linha por ativo.
+
+Fonte principal:
+- Assets
+
+Observação importante:
+Apesar do nome "payment_history_monthly", a consulta atual não cria uma linha
+por mês, não calcula parcelas mensais e não consulta uma tabela de histórico
+de pagamentos. Atualmente, ela funciona apenas como uma extração da tabela
+Assets.
+
+Forma de consulta:
+SELECT *
+FROM analytics_mart.vw_asset_payment_history_monthly;
+*/
+
 SELECT "Assets".id_asset,
     "Assets".id_property,
     "Assets".id_classification,

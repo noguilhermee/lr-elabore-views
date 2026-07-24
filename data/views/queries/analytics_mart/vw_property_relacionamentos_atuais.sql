@@ -1,3 +1,32 @@
+/*
+VIEW: analytics_mart.vw_property_relacionamentos_atuais
+
+Finalidade:
+Consolida em uma única linha os relacionamentos operacionais atuais de cada
+propriedade com consultor, empreendedor e agroindústria.
+
+Granularidade:
+Uma linha por propriedade.
+
+Fontes principais:
+- analytics_int.vw_dim_property_base
+- analytics_int.vw_bridge_property_consultant
+- analytics_int.vw_bridge_property_entrepreneur
+- analytics_int.vw_bridge_property_agroindustry
+
+Regras principais:
+- Considera apenas relacionamentos operacionais atuais.
+- Quando existe mais de um vínculo, seleciona o registro mais recente.
+- Para consultores, utiliza também a data de criação da associação como
+  critério de desempate.
+- Mantém propriedades sem algum dos relacionamentos por meio de LEFT JOIN.
+- Retorna também a situação cadastral e a aprovação da propriedade.
+
+Forma de consulta:
+SELECT *
+FROM analytics_mart.vw_property_relacionamentos_atuais;
+*/
+
 WITH consultor_rank AS (
         SELECT b.id_property,
             b.id_consultant,

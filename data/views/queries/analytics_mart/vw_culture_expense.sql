@@ -1,3 +1,29 @@
+/*
+VIEW: analytics_mart.vw_culture_expense
+
+Finalidade:
+Detalha os produtos e insumos aplicados nas culturas, reunindo informações
+sobre propriedade, área, cultura, estágio, operação, quantidade, consumo,
+custo unitário e custo total.
+
+Granularidade:
+Uma linha por item ou produto aplicado em um manejo de cultura.
+
+Fontes principais:
+- CultureExpenseManagementProduct
+- CultureExpenseManagement
+
+Regras principais:
+- Considera apenas manejos ativos.
+- Considera apenas produtos ou itens ativos.
+- Exclui operações de armazenamento identificadas como ESTOCAR.
+- Define a competência mensal a partir da data de aplicação do produto.
+
+Forma de consulta:
+SELECT *
+FROM analytics_mart.vw_culture_expense;
+*/
+
 SELECT cem.id_property,
     cemp.id_management_product,
     date_trunc('month'::text, cemp.applied_at)::date AS reference_month,

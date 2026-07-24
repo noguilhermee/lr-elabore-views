@@ -1,3 +1,34 @@
+/*
+VIEW: analytics_mart.vw_labor
+
+Finalidade:
+Consolida mensalmente os custos e as quantidades de mão de obra familiar e
+contratada utilizados em cada propriedade.
+
+Granularidade:
+Uma linha por propriedade e mês.
+
+Indicadores consolidados:
+- Despesa com mão de obra familiar
+- Quantidade de mão de obra familiar
+- Despesa com mão de obra contratada
+- Quantidade de mão de obra contratada
+
+Regras principais:
+- Combina lançamentos das abas LABOR e OWN_MILK.
+- Considera somente lançamentos ativos.
+- Exclui operações de armazenamento identificadas como ESTOCAR.
+- Agrupa diferentes tipos de trabalhadores contratados em um único indicador.
+
+Observação:
+Os valores de despesas incorporam lançamentos da aba OWN_MILK, enquanto as
+quantidades são calculadas principalmente a partir dos registros da aba LABOR.
+
+Forma de consulta:
+SELECT *
+FROM analytics_mart.vw_labor;
+*/
+
 SELECT "ExpenseEntry".id_property,
     date_trunc('month'::text, "ExpenseEntry".reference_month)::date AS reference_month,
     sum(

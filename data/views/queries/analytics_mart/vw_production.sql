@@ -1,3 +1,37 @@
+/*
+VIEW: analytics_mart.vw_production
+
+Finalidade:
+Disponibiliza os registros de produção e colheita das culturas vinculadas às
+áreas de cada propriedade.
+
+Granularidade:
+Uma linha por registro de produção ou colheita.
+
+Informações principais:
+- Propriedade
+- Cultura
+- Cultura plantada
+- Mês de referência
+- Área produzida ou colhida
+- Quantidade produzida
+- Data da colheita
+
+Regras principais:
+- Considera somente registros de produção ativos.
+- Considera somente culturas plantadas ativas.
+- Identifica a propriedade por meio da área vinculada à cultura plantada.
+- A coluna reference_month corresponde ao primeiro dia do mês da colheita.
+
+Observação:
+A consulta não consolida os registros mensalmente. Uma propriedade pode ter
+várias linhas no mesmo mês.
+
+Forma de consulta:
+SELECT *
+FROM analytics_mart.vw_production;
+*/
+
 SELECT a.id_property,
     p.id_production AS id,
     pc.id_culture,

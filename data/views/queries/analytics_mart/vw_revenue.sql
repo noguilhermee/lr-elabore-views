@@ -1,3 +1,41 @@
+/*
+VIEW: analytics_mart.vw_revenue
+
+Finalidade:
+Consolida mensalmente as receitas das propriedades, separando a venda de leite,
+derivados, animais, alimentos e outras fontes de entrada financeira.
+
+Granularidade:
+Uma linha por propriedade e mês.
+
+Indicadores principais:
+- Receita e volume de leite vendido
+- Preço unitário do leite
+- CCS, CPP, gordura e proteína
+- Receita, volume e preço dos derivados
+- Empréstimos recebidos
+- Venda de animais
+- Outras receitas
+- Bonificações e penalizações de preço
+- Venda de volumosos e concentrados
+- Divisão de sobras
+
+Regras principais:
+- Considera somente lançamentos ativos.
+- Soma as receitas conforme o tipo do lançamento.
+- Extrai volumes e preços do campo JSON payload.
+- Extrai os indicadores de qualidade do campo JSON quality_indicators.
+- Utiliza o maior valor mensal para preço e indicadores de qualidade.
+
+Observação:
+Os campos milk_unit_price, CCS, CPP, gordura e proteína utilizam MAX, e não
+média ponderada. O volume de derivados também utiliza MAX, e não soma.
+
+Forma de consulta:
+SELECT *
+FROM analytics_mart.vw_revenue;
+*/
+
 SELECT "RevenueEntry".id_property,
     date_trunc('month'::text, "RevenueEntry".reference_month)::date AS reference_month,
     sum(

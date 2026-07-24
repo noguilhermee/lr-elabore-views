@@ -1,3 +1,36 @@
+/*
+VIEW: analytics_mart.vw_cattle
+
+Finalidade:
+Consolida mensalmente o rebanho de cada propriedade, apresentando a quantidade
+de animais e os valores informados para cada categoria.
+
+Granularidade:
+Uma linha por propriedade e mês.
+
+Categorias consolidadas:
+- Vacas em lactação
+- Vacas secas
+- Aleitamento
+- Recria
+- Machos
+- Outras categorias
+
+Indicadores derivados:
+- Total de vacas
+- Total do rebanho
+- Valores informados por categoria
+
+Regras principais:
+- Utiliza o ano e o mês cadastrados em CattlePeriod.
+- Considera somente categorias ativas.
+- Agrupa as informações por propriedade e competência mensal.
+
+Forma de consulta:
+SELECT *
+FROM analytics_mart.vw_cattle;
+*/
+
 SELECT cp.id_property,
     make_date(cp.year, cp.month, 1) AS reference_month,
     sum( CASE WHEN cc.name = 'Vacas em lactação'::text THEN c.total_animals ELSE 0 END) AS lactating_cows,

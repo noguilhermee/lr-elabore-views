@@ -1,30 +1,3 @@
-/*
-VIEW: analytics_mart.vw_asset_capital_stock
-
-Finalidade:
-Calcula mensalmente o estoque bruto de capital e a depreciação dos ativos
-cadastrados em cada propriedade.
-
-Granularidade:
-Uma linha por ativo e mês.
-
-Regras principais:
-- Expande cada ativo desde o mês de aquisição até seu término ou o mês atual.
-- Utiliza a quantidade e o valor unitário para calcular o estoque bruto.
-- Recupera a revisão de valor mais recente disponível em cada mês.
-- Utiliza a vida útil do ativo ou, quando ausente, a vida útil da classificação.
-- Calcula a depreciação mensal pelo método linear.
-- Considera a data específica de início da depreciação para ativos em construção.
-
-Observações:
-- O estoque bruto não é reduzido pela depreciação acumulada.
-- A consulta não aplica diretamente um filtro sobre Assets.is_active.
-
-Forma de consulta:
-SELECT *
-FROM analytics_mart.vw_asset_capital_stock;
-*/
-
 WITH asset_months AS (
         SELECT a.id_asset,
             a.id_property,
@@ -42,7 +15,6 @@ WITH asset_months AS (
                     ELSE COALESCE(a.depreciation_starts_at, a.acquired_at)
                 END AS depreciation_starts_at,
             gs.reference_month::date AS reference_month
-            
             FROM "Assets" a
                 LEFT JOIN "Classification" c ON a.id_classification = c.id_classification
                 CROSS JOIN LATERAL generate_series(date_trunc('month'::text, a.acquired_at)::date::timestamp with time zone, date_trunc('month'::text, LEAST(COALESCE(a.finished_at::date, CURRENT_DATE), CURRENT_DATE)::timestamp with time zone)::date::timestamp with time zone, '1 mon'::interval) gs(reference_month)
@@ -88,7 +60,7 @@ WITH asset_months AS (
                     WHEN av.service_life_years > 0 AND av.depreciation_starts_at IS NOT NULL AND av.reference_month >= date_trunc('month'::text, av.depreciation_starts_at)::date AND av.reference_month < (date_trunc('month'::text, av.depreciation_starts_at) + (av.service_life_years * 12)::double precision * '1 mon'::interval)::date THEN av.quantity * av.current_unit_value / (av.service_life_years * 12)::numeric
                     ELSE 0::numeric
                 END AS monthly_depreciation
-        FROM asset_values av
+            FROM asset_values av
     )
 SELECT capital_calculation.id_asset,
     capital_calculation.id_property,
