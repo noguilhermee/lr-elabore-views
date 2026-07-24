@@ -1,3 +1,43 @@
+/*
+MATERIALIZED VIEW: analytics_mart.mvw_area_land_summary
+
+Finalidade:
+Consolida mensalmente as áreas rurais de cada propriedade, separando os
+hectares próprios e arrendados conforme a finalidade de uso da área.
+
+Granularidade:
+Uma linha por propriedade e mês de referência.
+
+Categorias consideradas:
+- Área de Benfeitorias e Estradas
+- Reserva Legal e APP
+- Forrageiras
+
+Indicadores calculados:
+- Hectares próprios por tipo de uso
+- Hectares arrendados por tipo de uso
+- Valor médio ponderado da terra por tipo de uso
+
+Regras principais:
+- Expande cada área para todos os meses entre sua data de início e sua
+  data de término ou, quando não encerrada, até o mês atual.
+- Exclui registros inativos que não possuem data de término.
+- Calcula o valor médio da terra ponderado pelos hectares próprios.
+- Utiliza diretamente o campo raw_land_value da tabela Area.
+- Não considera o histórico de alterações do valor da terra.
+
+Fontes principais:
+- Area
+- AreaUsage
+
+Forma de consulta:
+SELECT *
+FROM analytics_mart.mvw_area_land_summary;
+
+Forma de atualização:
+REFRESH MATERIALIZED VIEW analytics_mart.mvw_area_land_summary;
+*/
+
 WITH area_usage_map AS (
         SELECT a.id_area,
         a.id_property,
@@ -23,45 +63,45 @@ WITH area_usage_map AS (
             CROSS JOIN LATERAL generate_series(date_trunc('month'::text, m.started_at), date_trunc('month'::text, COALESCE(m.finished_at, CURRENT_DATE::timestamp without time zone)), '1 mon'::interval) gs(reference_month)
     ), area_pivot AS (
         SELECT area_timeline.id_area,
-        area_timeline.id_property,
-        area_timeline.reference_month,
-            CASE
-                WHEN area_timeline.area_usage_type = 'Área de Benfeitorias e Estradas'::text THEN area_timeline.hectares_owned
-                ELSE NULL::double precision
-            END AS hectares_owned_benfeitorias_estradas,
-            CASE
-                WHEN area_timeline.area_usage_type = 'Reserva Legal e APP'::text THEN area_timeline.hectares_owned
-                ELSE NULL::double precision
-            END AS hectares_owned_app_reserva_legal,
-            CASE
-                WHEN area_timeline.area_usage_type = 'Forrageiras'::text THEN area_timeline.hectares_owned
-                ELSE NULL::double precision
-            END AS hectares_owned_forrageiras,
-            CASE
-                WHEN area_timeline.area_usage_type = 'Área de Benfeitorias e Estradas'::text THEN area_timeline.hectares_rented
-                ELSE NULL::double precision
-            END AS hectares_rented_benfeitorias_estradas,
-            CASE
-                WHEN area_timeline.area_usage_type = 'Reserva Legal e APP'::text THEN area_timeline.hectares_rented
-                ELSE NULL::double precision
-            END AS hectares_rented_app_reserva_legal,
-            CASE
-                WHEN area_timeline.area_usage_type = 'Forrageiras'::text THEN area_timeline.hectares_rented
-                ELSE NULL::double precision
-            END AS hectares_rented_forrageiras,
-            CASE
-                WHEN area_timeline.area_usage_type = 'Área de Benfeitorias e Estradas'::text THEN area_timeline.raw_land_value
-                ELSE NULL::double precision
-            END AS raw_land_value_benfeitorias_estradas,
-            CASE
-                WHEN area_timeline.area_usage_type = 'Reserva Legal e APP'::text THEN area_timeline.raw_land_value
-                ELSE NULL::double precision
-            END AS raw_land_value_app_reserva_legal,
-            CASE
-                WHEN area_timeline.area_usage_type = 'Forrageiras'::text THEN area_timeline.raw_land_value
-                ELSE NULL::double precision
-            END AS raw_land_value_forrageiras
-        FROM area_timeline
+            area_timeline.id_property,
+            area_timeline.reference_month,
+                CASE
+                    WHEN area_timeline.area_usage_type = 'Área de Benfeitorias e Estradas'::text THEN area_timeline.hectares_owned
+                    ELSE NULL::double precision
+                END AS hectares_owned_benfeitorias_estradas,
+                CASE
+                    WHEN area_timeline.area_usage_type = 'Reserva Legal e APP'::text THEN area_timeline.hectares_owned
+                    ELSE NULL::double precision
+                END AS hectares_owned_app_reserva_legal,
+                CASE
+                    WHEN area_timeline.area_usage_type = 'Forrageiras'::text THEN area_timeline.hectares_owned
+                    ELSE NULL::double precision
+                END AS hectares_owned_forrageiras,
+                CASE
+                    WHEN area_timeline.area_usage_type = 'Área de Benfeitorias e Estradas'::text THEN area_timeline.hectares_rented
+                    ELSE NULL::double precision
+                END AS hectares_rented_benfeitorias_estradas,
+                CASE
+                    WHEN area_timeline.area_usage_type = 'Reserva Legal e APP'::text THEN area_timeline.hectares_rented
+                    ELSE NULL::double precision
+                END AS hectares_rented_app_reserva_legal,
+                CASE
+                    WHEN area_timeline.area_usage_type = 'Forrageiras'::text THEN area_timeline.hectares_rented
+                    ELSE NULL::double precision
+                END AS hectares_rented_forrageiras,
+                CASE
+                    WHEN area_timeline.area_usage_type = 'Área de Benfeitorias e Estradas'::text THEN area_timeline.raw_land_value
+                    ELSE NULL::double precision
+                END AS raw_land_value_benfeitorias_estradas,
+                CASE
+                    WHEN area_timeline.area_usage_type = 'Reserva Legal e APP'::text THEN area_timeline.raw_land_value
+                    ELSE NULL::double precision
+                END AS raw_land_value_app_reserva_legal,
+                CASE
+                    WHEN area_timeline.area_usage_type = 'Forrageiras'::text THEN area_timeline.raw_land_value
+                    ELSE NULL::double precision
+                END AS raw_land_value_forrageiras
+            FROM area_timeline
     )
 SELECT area_pivot.id_property,
     area_pivot.reference_month,

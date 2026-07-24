@@ -29,6 +29,7 @@ Regras principais:
 Forma de consulta:
 SELECT *
 FROM analytics_mart.vw_expense;
+
 */
 
 SELECT "ExpenseEntry".id_property,

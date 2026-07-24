@@ -1,3 +1,41 @@
+/*
+MATERIALIZED VIEW: analytics_mart.mvw_asset_payment_history
+
+Finalidade:
+Calcula o histórico mensal de pagamentos dos ativos financiados ou adquiridos
+com entrada, relacionando os valores pagos ao estoque de capital do ativo.
+
+Granularidade:
+Uma linha por ativo e mês de referência.
+
+Indicadores calculados:
+- Valor acumulado das parcelas pagas
+- Percentual do ativo já pago
+- Estoque bruto de capital
+- Depreciação mensal
+- Estoque médio mensal de capital proporcional ao pagamento
+
+Regras principais:
+- Soma as parcelas pagas em cada mês.
+- Calcula o total acumulado das parcelas desde o início do ativo.
+- Acrescenta o valor da entrada ao total considerado como pago.
+- Limita o percentual pago ao intervalo entre 0% e 100%.
+- Considera somente ativos que possuem parcelas registradas ou valor de entrada.
+- Calcula o estoque médio mensal de capital pela seguinte regra:
+  percentual pago × estoque bruto de capital ÷ 24.
+
+Fontes principais:
+- AssetInstallment
+- analytics_mart.vw_asset_capital_stock
+
+Forma de consulta:
+SELECT *
+FROM analytics_mart.mvw_asset_payment_history;
+
+Forma de atualização:
+REFRESH MATERIALIZED VIEW analytics_mart.mvw_asset_payment_history;
+*/
+
 WITH monthly_payments AS (
         SELECT "AssetInstallment".id_asset,
             date_trunc('month'::text, "AssetInstallment".payment_date)::date AS reference_month,
