@@ -1,3 +1,16 @@
+/* VIEW: analytics_int.vw_bridge_property_consultant
+
+- Finalidade:
+Consolida os vínculos entre propriedades e consultores, incluindo o período
+de validade, a situação da aprovação, o status operacional e a remoção de
+registros duplicados do mesmo vínculo.
+
+- Forma de consulta:
+SELECT *
+FROM analytics_int.vw_bridge_property_consultant;
+
+*/
+
 WITH consultant_links AS (
     SELECT pu.id_property,
         pu.id_user AS id_consultant,

@@ -1,3 +1,17 @@
+/*
+VIEW: analytics_int.vw_bridge_property_entrepreneur
+
+- Finalidade:
+Relaciona cada propriedade ao seu empreendedor, apresentando os dados de
+identificação, o período de validade do vínculo e os indicadores de vínculo
+estrutural e operacional atualmente ativos.
+
+- Forma de consulta:
+SELECT *
+FROM analytics_int.vw_bridge_property_entrepreneur;
+
+*/
+
 SELECT p.id_property,
     p.id_entrepreneur,
     e.name AS entrepreneur_name,

@@ -1,4 +1,18 @@
- WITH latest_land_value AS (
+/*
+VIEW: analytics_int.vw_dim_property_base
+
+- Finalidade:
+Cria a dimensão cadastral consolidada das propriedades rurais, reunindo dados
+da propriedade, empreendedor, agroindústria, localização, valor mais recente
+da terra e classificação da situação cadastral da propriedade.
+
+- Forma de consulta:
+SELECT *
+FROM analytics_int.vw_dim_property_base;
+
+*/
+
+WITH latest_land_value AS (
     SELECT plvh.id_property,
     plvh.value AS land_value_latest,
     plvh.updated_at AS land_value_updated_at,

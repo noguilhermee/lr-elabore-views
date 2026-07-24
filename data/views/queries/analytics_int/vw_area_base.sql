@@ -1,3 +1,15 @@
+/* VIEW: analytics_int.vw_area_base 
+
+- Finalidade: 
+Consolida os dados cadastrais das áreas vinculadas às propriedades rurais, 
+incluindo o tipo de uso, área própria, área arrendada, área total, valor da terra 
+e informações de vigência e status do cadastro. 
+
+- Forma de consulta: 
+SELECT * FROM analytics_int.vw_area_base; 
+
+*/
+
 SELECT a.id_area,
     a.id_property,
     p.property_name,
@@ -13,7 +25,7 @@ SELECT a.id_area,
     a.is_active,
     a.created_at,
     a.updated_at
-
+    
     FROM "Area" a
         LEFT JOIN "Property" p ON p.id_property = a.id_property
         LEFT JOIN "AreaUsage" au ON au.id_area_usage = a.id_area_usage;

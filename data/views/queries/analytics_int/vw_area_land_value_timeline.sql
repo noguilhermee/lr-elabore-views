@@ -1,3 +1,15 @@
+/* VIEW: analytics_int.vw_area_land_value_timeline
+
+- Finalidade:
+Organiza a linha do tempo dos valores da terra por área, reunindo os registros
+do histórico de alterações e, como informação complementar, o valor cadastrado
+diretamente na tabela de áreas.
+
+- Forma de consulta:
+SELECT * FROM analytics_int.vw_area_land_value_timeline;
+
+*/
+
 WITH hist AS (
     SELECT h.id_area,
         h.value AS land_value,

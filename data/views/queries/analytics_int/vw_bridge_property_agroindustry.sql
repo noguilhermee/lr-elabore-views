@@ -1,3 +1,15 @@
+/* VIEW: analytics_int.vw_bridge_property_agroindustry
+
+- Finalidade:
+Relaciona cada propriedade à sua agroindústria, apresentando os dados de
+identificação, o período de validade do vínculo e os indicadores de vínculo
+estrutural e operacional atualmente ativos.
+
+- Forma de consulta:
+SELECT * FROM analytics_int.vw_bridge_property_agroindustry;
+*/
+
+
 SELECT p.id_property,
     p.id_agroindustry,
     a.name AS agroindustry_name,
