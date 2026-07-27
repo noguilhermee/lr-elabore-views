@@ -11,6 +11,17 @@ FROM analytics_int.vw_bridge_property_consultant;
 
 */
 
+-- Finalidade: consolidar os vínculos entre propriedade e consultor para consumo analítico.
+-- Granularidade: 1 linha por vínculo propriedade-consultor vigente na regra operacional da análise.
+-- Fontes principais: PropertyUsers, User, UserType e Property.
+-- Regras de negócio relevantes:
+--   - a propriedade continua sendo a unidade principal de cálculo;
+--   - na camada de Cálculo de Médias, a mesma propriedade pode ser duplicada para cada consultor vinculado;
+--   - essa duplicação é intencional e serve à análise de consultoria;
+--   - a base duplicada não deve ser usada para consolidar totais gerais sem reagrupamento por propriedade.
+-- Forma básica de consulta:
+--   SELECT * FROM analytics_int.vw_bridge_property_consultant;
+
 WITH consultant_links AS (
     SELECT pu.id_property,
         pu.id_user AS id_consultant,
@@ -33,6 +44,7 @@ WITH consultant_links AS (
         JOIN "Property" p ON p.id_property = pu.id_property
     WHERE ut.name = 'Consultor(a)'::text
 )
+
 SELECT consultant_links.id_property,
     consultant_links.id_consultant,
     consultant_links.consultant_name,
