@@ -1,148 +1,198 @@
-# 🚀 lr-functions
+# 📊 elabore-views
 
-Biblioteca interna com funções utilitárias para integração com SharePoint utilizando Microsoft Graph API.
-
-O objetivo deste projeto é centralizar as funções mais utilizadas para:
-
-- 🔐 autenticação no Microsoft Graph
-- 🌐 conexão com SharePoint
-- 📥 extração de listas
-- ⚡ cargas incrementais
-- 📄 paginação automática
-- 🐼 transformação de JSON para DataFrame
-- ❌ tratamento de erros
-- 💾 checkpoints de ETL
+Pipeline analítico da **Labor Rural** para extração, consolidação e exportação de indicadores gerenciais de fazendas a partir do sistema **Elabore**.
 
 ---
 
-# 📁 Estrutura do Projeto
+## 🎯 Objetivo
+
+Transformar os dados brutos do Elabore em indicadores estruturados por propriedade e período, entregues em arquivos Excel para análise interna.
+
+Os produtos principais são:
+
+- 📅 **Indicadores mensais** — por propriedade × mês de referência
+- 📆 **Indicadores anuais** — por propriedade × ano
+- 📁 **Arquivos Excel** — para análise e uso interno
+
+---
+
+## 📁 Estrutura do Projeto
 
 ```text
-lr-functions/
+elabore-views/
 │
 ├── app/
-│   └── main.ipynb              # Notebook principal de testes
-│
-├── data/
-│   ├── .env                    # Variáveis de ambiente
-│   └── dados.txt
+│   └── Elabore Indicadores.ipynb       # Fluxo principal: ETL + exportação
+│   └── backup/                         # Versões antigas (referência apenas)
 │
 ├── functions/
-│   └── sharepoint_utils.py     # Funções utilitárias SharePoint
+│   └── sharepoint_utils.py             # Utilitários SharePoint, banco e Excel
 │
-└── README.md
+└── data/
+    ├── views/
+    │   └── queries/
+    │       ├── analytics_int/          # Views intermediárias (integração)
+    │       ├── analytics_mart/         # Views prontas para consumo analítico
+    │       └── materialized/           # Materialized views
+    │   └── queries_old/                # Consultas antigas (somente referência)
+    ├── outputs/
+    │   ├── monthly/                    # Exportações mensais
+    │   └── annual/                     # Exportações anuais
+    └── tables/
 ```
 
 ---
 
-# 🛠️ Funcionalidades
+## 🔄 Fluxo de Dados
 
-## 🔐 Microsoft Graph Authentication
-
-Funções para geração de token OAuth2 utilizando:
-
-- Tenant ID
-- Client ID
-- Client Secret
-
----
-
-## 🌐 SharePoint Integration
-
-Funções para:
-
-- 📂 listar sites
-- 📋 listar listas
-- 📥 buscar itens
-- 🔄 paginação automática
-- ⚡ cargas incrementais
+```
+PostgreSQL (Elabore)
+        │
+        ▼
+analytics_int  ──▶  analytics_mart  ──▶  Materialized Views
+                                               │
+                          SharePoint ──────────┤
+                                               ▼
+                              Elabore Indicadores.ipynb
+                                               │
+                      ┌────────────────────────┤
+                      ▼                        ▼
+              outputs/monthly/         outputs/annual/
+              (Excel mensal)           (Excel anual)
+```
 
 ---
 
-## 📊 ETL Utilities
+## 🗄️ Camada SQL
 
-- 🐼 transformação para pandas DataFrame
-- 💾 checkpoints
-- 📅 filtros incrementais
-- 📝 logs
-- ❌ tratamento de erros
+As views são organizadas em três camadas com responsabilidades distintas.
+
+### `analytics_int` — Integração (4 views)
+
+Camada intermediária com dimensões cadastrais e relacionamentos entre entidades.
+
+| View | Descrição |
+|------|-----------|
+| `vw_dim_property_base` | Dimensão consolidada das propriedades: nome, empreendedor, agroindústria, localização, valor da terra e status cadastral |
+| `vw_bridge_property_agroindustry` | Ligação propriedade × agroindústria |
+| `vw_bridge_property_consultant` | Ligação propriedade × consultor |
+| `vw_bridge_property_entrepreneur` | Ligação propriedade × empresário |
+
+### `analytics_mart` — Consumo Analítico (9 views)
+
+Views prontas para consumo, com granularidade de **uma linha por propriedade × mês**.
+
+| View | Descrição |
+|------|-----------|
+| `vw_expense` | Despesas mensais categorizadas: alimentação animal, sanidade, arrendamento, energia, mão de obra, reprodução, etc. |
+| `vw_revenue` | Receitas mensais por fonte |
+| `vw_feeding` | Gastos com alimentação do rebanho |
+| `vw_cattle` | Composição e movimentação do rebanho bovino |
+| `vw_labor` | Custos de mão de obra |
+| `vw_own_milk` | Leite próprio consumido na propriedade |
+| `vw_asset_capital_stock` | Estoque de capital e depreciação de ativos |
+| `vw_dairy_production_system_monthly` | Sistema predominante de produção de leite (Compost Barn, Free Stall, Semi-confinado, Pastagem, MIXED) |
+| `dim_consultor_propriedade` | Dimensão consultor × propriedade |
+
+### `materialized` — Views Materializadas (3)
+
+| View | Descrição |
+|------|-----------|
+| `mvw_area_land_summary` | Resumo de área e uso da terra por propriedade |
+| `mvw_asset_capital_stock` | Estoque de capital materializado para consulta eficiente |
+| `mvw_asset_payment_history` | Histórico de pagamentos de ativos |
 
 ---
 
-# ⚙️ Configuração
+## 🐍 Camada Python
 
-Criar arquivo `.env` dentro da pasta `data/`.
+### `app/Elabore Indicadores.ipynb`
 
-Exemplo:
+Notebook principal executável em sequência. Responsável por:
+
+1. Conectar ao PostgreSQL via SQLAlchemy/psycopg2
+2. Consultar as views do `analytics_mart`
+3. Integrar dados complementares do SharePoint (via Microsoft Graph API)
+4. Aplicar transformações e consolidações com pandas
+5. Calcular indicadores mensais e anuais por propriedade
+6. Exportar arquivos Excel formatados com openpyxl
+
+### `functions/sharepoint_utils.py`
+
+Biblioteca interna com utilitários para:
+
+- 🔐 Autenticação OAuth2 no Microsoft Graph (Client Credentials)
+- 📥 Extração de listas do SharePoint com paginação automática e carga incremental
+- 🐼 Conversão de JSON → pandas DataFrame por tipo de lista
+- 💾 Checkpoints de ETL para reaproveitamento de execuções anteriores
+- ❌ Tratamento de erros, logs e validações
+
+---
+
+## ⚙️ Configuração
+
+Crie o arquivo `.env` na raiz do projeto com as credenciais necessárias:
 
 ```env
-TENANT_ID=xxxxxxxx
-CLIENT_ID=xxxxxxxx
-CLIENT_SECRET=xxxxxxxx
-SITE_ID=xxxxxxxx
+# Banco de dados
+DB_HOST=
+DB_PORT=
+DB_NAME=
+DB_USER=
+DB_PASSWORD=
+
+# Microsoft Graph / SharePoint
+TENANT_ID=
+CLIENT_ID=
+CLIENT_SECRET=
+SITE_ID=
 ```
+
+> ⚠️ O arquivo `.env` é local e **nunca deve ser versionado**.
 
 ---
 
-# 📦 Instalação
+## 📦 Dependências
 
 ```bash
-pip install pandas requests python-dotenv
+pip install pandas sqlalchemy psycopg2-binary openpyxl requests python-dotenv
 ```
 
 ---
 
-# ▶️ Exemplo de Uso
+## 🧰 Tecnologias
 
-```python
-from functions.sharepoint_utils import *
-
-token = get_access_token()
-
-dados = get_sharepoint_data_incremental(
-    list_id='LIST_ID',
-    list_name='saidaestoque',
-    access_token=token,
-    incremental=False
-)
-
-df = saidaestoque_to_dataframe(dados)
-
-print(df.head())
-```
+| Camada | Tecnologia |
+|--------|------------|
+| Banco de dados | PostgreSQL |
+| Queries analíticas | SQL (Views e Materialized Views) |
+| Conexão ao banco | SQLAlchemy / psycopg2 |
+| Transformação de dados | Python + pandas |
+| Integração externa | Microsoft Graph API + SharePoint Online |
+| Exportação | openpyxl (Excel) |
+| Orquestração | Jupyter Notebook |
+| Credenciais | python-dotenv |
 
 ---
 
-# 🧰 Principais Tecnologias
+## 📌 Convenções
 
-- 🐍 Python
-- 🐼 Pandas
-- 🌐 Requests
-- ☁️ Microsoft Graph API
-- 📂 SharePoint Online
-
----
-
-# 🎯 Objetivo
-
-Este repositório foi criado para reutilização de funções comuns utilizadas em projetos de Analytics e Engenharia de Dados envolvendo SharePoint.
+- Granularidade mensal: chave `id_property` + `reference_month` (normalizada para o 1º dia do mês)
+- Granularidade anual: agregação por `id_property` + ano, após os tratamentos mensais
+- Merges com `validate=` sempre que a cardinalidade for conhecida
+- Nenhuma divisão por zero sem tratamento explícito
+- Exportações históricas não são sobrescritas sem solicitação explícita
 
 ---
 
-# 👨‍💻 Autor
-
+## 👨‍💻 Autor
 
 **Guilherme Henrique Fonseca Nogueira**
 
-* 🎓 **Mestre em Economia Aplicada** (PPGEA/UFV)
-* 🎓 **Bacharel em Ciências Econômicas** (UFSJ)
-* 📊 **Cientista de Dados** (Escola DNC)
+- 🎓 Mestre em Economia Aplicada (PPGEA/UFV)
+- 🎓 Bacharel em Ciências Econômicas (UFSJ)
+- 📊 Cientista de Dados (Escola DNC)
 
----
-
-### Contato e Redes
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/noguilhermee/)
 [![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/noguilhermee)
-[![Lattes](https://img.shields.io/badge/Currículo_Lattes-104E8B?style=flat-square&logo=google-scholar&logoColor=white)](http://lattes.cnpq.br/9226285374070081)
-
----
+[![Lattes](https://img.shields.io/badge/Currículo_Lattes-104E8B?style=flat-square&logo=google-scholar&logoColor=white)](http://lattes.cnpq.br/9226285374070081)
