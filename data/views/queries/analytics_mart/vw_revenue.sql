@@ -6,34 +6,25 @@ Consolida mensalmente as receitas das propriedades, separando a venda de leite,
 derivados, animais, alimentos e outras fontes de entrada financeira.
 
 Granularidade:
-Uma linha por propriedade e mês.
+Uma linha por propriedade e mês (id_property + reference_month).
 
-Indicadores principais:
-- Receita e volume de leite vendido
-- Preço unitário do leite
-- CCS, CPP, gordura e proteína
-- Receita, volume e preço dos derivados
-- Empréstimos recebidos
-- Venda de animais
-- Outras receitas
-- Bonificações e penalizações de preço
-- Venda de volumosos e concentrados
-- Divisão de sobras
+Fontes principais:
+- RevenueEntry
 
-Regras principais:
-- Considera somente lançamentos ativos.
-- Soma as receitas conforme o tipo do lançamento.
+Regras de negócio:
+- Considera somente lançamentos ativos (is_active = true).
+- Soma as receitas conforme o tipo do lançamento (RevenueType).
 - Extrai volumes e preços do campo JSON payload.
-- Extrai os indicadores de qualidade do campo JSON quality_indicators.
-- Utiliza o maior valor mensal para preço e indicadores de qualidade.
-
-Observação:
-Os campos milk_unit_price, CCS, CPP, gordura e proteína utilizam MAX, e não
-média ponderada. O volume de derivados também utiliza MAX, e não soma.
+- Extrai indicadores de qualidade do campo JSON quality_indicators.
+- Utiliza MAX (não média ponderada) para milk_unit_price, CCS, CPP, gordura e proteína.
+- Utiliza MAX (não soma) para volume de derivados.
+- Indicadores principais: receita e volume de leite vendido, preço unitário,
+  CCS, CPP, gordura, proteína, receita de derivados, empréstimos recebidos,
+  venda de animais, outras receitas, bonificações, penalizações, venda de
+  volumosos e concentrados, divisão de sobras.
 
 Forma de consulta:
-SELECT *
-FROM analytics_mart.vw_revenue;
+SELECT * FROM analytics_mart.vw_revenue;
 */
 
 SELECT "RevenueEntry".id_property,
@@ -131,4 +122,5 @@ SELECT "RevenueEntry".id_property,
     
     FROM "RevenueEntry"
     WHERE "RevenueEntry".is_active = true
-    GROUP BY "RevenueEntry".id_property, (date_trunc('month'::text, "RevenueEntry".reference_month));
+    GROUP BY "RevenueEntry".id_property, (date_trunc('month'::text, "RevenueEntry".reference_month))
+    ORDER BY "RevenueEntry".id_property, (date_trunc('month'::text, "RevenueEntry".reference_month));

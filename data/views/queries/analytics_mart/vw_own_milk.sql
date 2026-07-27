@@ -6,25 +6,21 @@ Consolida mensalmente os lançamentos relacionados ao uso interno ou ao custo
 de oportunidade do leite produzido na propriedade.
 
 Granularidade:
-Uma linha por propriedade e mês.
+Uma linha por propriedade e mês (id_property + reference_month).
 
-Indicadores consolidados:
-- Preço unitário do leite
-- Leite relacionado à mão de obra contratada
-- Leite descartado
-- Leite destinado aos bezerros
-- Leite relacionado à mão de obra familiar
-- Quantidades e valores totais de cada finalidade
+Fontes principais:
+- ExpenseEntry
 
-Regras principais:
-- Considera somente lançamentos ativos.
+Regras de negócio:
+- Considera somente lançamentos ativos (is_active = true).
 - Considera apenas registros da aba OWN_MILK.
-- Utiliza o maior preço unitário encontrado no mês.
-- Soma separadamente quantidades e valores conforme o código do lançamento.
+- Utiliza o maior preço unitário encontrado no mês (MAX, não média ponderada).
+- Indicadores: preço unitário do leite, leite para mão de obra contratada,
+  leite descartado, leite para bezerros, leite para mão de obra familiar,
+  com quantidades e valores totais separados para cada finalidade.
 
 Forma de consulta:
-SELECT *
-FROM analytics_mart.vw_own_milk;
+SELECT * FROM analytics_mart.vw_own_milk;
 */
 
 SELECT "ExpenseEntry".id_property,

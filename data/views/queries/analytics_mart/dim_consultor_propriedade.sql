@@ -1,34 +1,31 @@
 /*
-OBJETO: analytics_mart.dim_consultor_propriedade
+VIEW: analytics_mart.dim_consultor_propriedade
 
 Finalidade:
-Cria uma dimensão de relacionamento entre consultores e propriedades,
-identificando os usuários cadastrados com o tipo "Consultor(a)" e as
-propriedades às quais estão vinculados.
+Dimensão de relacionamento entre consultores e propriedades, identificando
+os vínculos operacionalmente ativos. Consome da bridge intermediária para
+evitar duplicação de lógica de deduplicação e vigência.
 
 Granularidade:
-Uma linha por vínculo entre consultor e propriedade.
+Uma linha por vínculo ativo entre consultor e propriedade.
 
 Fontes principais:
-- PropertyUsers
-- User
-- UserType
+- analytics_int.vw_bridge_property_consultant
 
-Observação:
-A consulta não aplica filtro de usuário ativo nem seleciona apenas o vínculo
-mais recente. Um consultor pode aparecer em várias propriedades, e uma
-propriedade pode aparecer associada a mais de um consultor.
+Regras de negócio:
+- Consome exclusivamente da bridge intermediária (analytics_int).
+- Filtra apenas vínculos operacionalmente ativos (is_current_operational).
+- Um consultor pode aparecer em várias propriedades.
+- Uma propriedade pode ter mais de um consultor vinculado.
+- A deduplicação de vínculos duplicados é feita na bridge (analytics_int).
 
 Forma de consulta:
-SELECT *
-FROM analytics_mart.dim_consultor_propriedade;
+SELECT * FROM analytics_mart.dim_consultor_propriedade;
 */
 
-SELECT u.id_user AS id_consultor,
-    u.name AS nome_consultor,
-    pu.id_property
+SELECT bpc.id_consultant AS id_consultor,
+    bpc.consultant_name AS nome_consultor,
+    bpc.id_property
     
-    FROM "PropertyUsers" pu
-    JOIN "User" u ON u.id_user = pu.id_user
-    JOIN "UserType" ut ON ut.id_type = u.id_type
-    WHERE ut.name = 'Consultor(a)'::text;
+    FROM analytics_int.vw_bridge_property_consultant bpc
+    WHERE bpc.is_current_operational = true;

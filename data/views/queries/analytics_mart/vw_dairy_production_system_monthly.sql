@@ -6,25 +6,22 @@ Classifica mensalmente o sistema predominante de produção de leite utilizado
 por cada propriedade.
 
 Granularidade:
-Uma linha por propriedade e mês.
+Uma linha por propriedade e mês (id_property + reference_month).
 
-Sistemas avaliados:
-- COMPOST_BARN
-- FREE_STALL
-- SEMI_CONFINED
-- PASTURE
-- UNSTRUCTURED_CONFINMENT
+Fontes principais:
+- DairyProduction
 
-Regras principais:
+Regras de negócio:
 - Considera apenas registros da categoria LACTATION.
 - Expande cada registro para todos os meses de sua vigência.
 - Quando existem vários registros no mesmo mês, seleciona o mais recente.
-- Classifica como predominante o sistema que possui o maior percentual.
+- Sistemas avaliados: COMPOST_BARN, FREE_STALL, SEMI_CONFINED, PASTURE,
+  UNSTRUCTURED_CONFINMENT.
+- Classifica como predominante o sistema com maior percentual.
 - Retorna MIXED quando dois ou mais sistemas possuem o mesmo maior percentual.
 
 Forma de consulta:
-SELECT *
-FROM analytics_mart.vw_dairy_production_system_monthly;
+SELECT * FROM analytics_mart.vw_dairy_production_system_monthly;
 */
 
 WITH expanded_months AS (

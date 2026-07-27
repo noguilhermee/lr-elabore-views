@@ -6,23 +6,27 @@ Calcula mensalmente o estoque bruto de capital e a depreciação dos ativos
 cadastrados em cada propriedade.
 
 Granularidade:
-Uma linha por ativo e mês.
+Uma linha por ativo e mês (id_asset + reference_month).
 
-Regras principais:
+Fontes principais:
+- Assets
+- Classification
+- AssetRevision
+
+Regras de negócio:
 - Expande cada ativo desde o mês de aquisição até seu término ou o mês atual.
-- Utiliza a quantidade e o valor unitário para calcular o estoque bruto.
-- Recupera a revisão de valor mais recente disponível em cada mês.
-- Utiliza a vida útil do ativo ou, quando ausente, a vida útil da classificação.
+- Utiliza a quantidade cadastrada ou assume 1 quando ausente.
+- Recupera a revisão de valor mais recente disponível em cada mês (LATERAL).
+- Utiliza a vida útil do ativo ou, quando ausente, a da classificação.
 - Calcula a depreciação mensal pelo método linear.
-- Considera a data específica de início da depreciação para ativos em construção.
-
-Observações:
+- Para ativos em construção, considera a data específica de início da depreciação.
 - O estoque bruto não é reduzido pela depreciação acumulada.
-- A consulta não aplica diretamente um filtro sobre Assets.is_active.
+- A consulta não aplica filtro sobre Assets.is_active.
+- Esta view é a definição canônica da lógica; a materialized view
+  mvw_asset_capital_stock contém a mesma lógica para performance.
 
 Forma de consulta:
-SELECT *
-FROM analytics_mart.vw_asset_capital_stock;
+SELECT * FROM analytics_mart.vw_asset_capital_stock;
 */
 
 WITH asset_months AS (

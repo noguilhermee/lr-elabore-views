@@ -6,28 +6,25 @@ Consolida mensalmente as despesas e quantidades de alimentos comprados e
 consumidos pelas propriedades, separando volumosos, concentrados e minerais.
 
 Granularidade:
-Uma linha por propriedade, mês e unidade padronizada.
+Uma linha por propriedade, mês e unidade padronizada (id_property + reference_month + unit).
+ATENÇÃO: a granularidade inclui unidade, podendo gerar múltiplas linhas
+por propriedade/mês quando existirem unidades diferentes.
 
-Indicadores consolidados:
-- Quantidade comprada
-- Quantidade consumida
-- Valor total
-- Separação entre volumoso, concentrado e mineral
+Fontes principais:
+- FeedingExpenseEntry
+- ExpenseEntry
 
-Regras principais:
-- Considera somente lançamentos de despesas ativos.
-- Exclui operações de armazenamento identificadas como ESTOCAR.
-- Converte toneladas para quilogramas utilizando o fator 1.000.
-- Converte a unidade específica de saca para quilogramas utilizando o fator 25.
+Regras de negócio:
+- Considera somente lançamentos de despesas ativos (is_active = true).
+- Exclui operações de armazenamento (ESTOCAR).
+- Converte toneladas para quilogramas (fator 1.000).
+- Converte saca para quilogramas (fator 25).
 - Mantém outras unidades conforme informadas, em letras minúsculas.
-
-Observação:
-Como a unidade faz parte do agrupamento, uma propriedade pode possuir mais
-de uma linha no mesmo mês quando existirem unidades diferentes.
+- Indicadores: quantidade comprada, quantidade consumida e valor total,
+  separados entre volumoso, concentrado e mineral.
 
 Forma de consulta:
-SELECT *
-FROM analytics_mart.vw_feeding;
+SELECT * FROM analytics_mart.vw_feeding;
 */
 
 SELECT f.id_property,

@@ -6,30 +6,24 @@ Consolida mensalmente as despesas gerais de cada propriedade, distribuindo
 os valores lançados em diferentes categorias econômicas e operacionais.
 
 Granularidade:
-Uma linha por propriedade e mês.
+Uma linha por propriedade e mês (id_property + reference_month).
 
-Principais grupos consolidados:
-- Despesas gerais e administração
-- Arrendamento e assistência técnica
-- Compra de animais e terras
-- Consertos e reparos
-- Juros, impostos e taxas
-- Hormônios, medicamentos e vacinas
-- Reprodução e sucedâneo
-- Material de ordenha
-- Leite destinado aos bezerros
-- Energia e combustíveis
+Fontes principais:
+- ExpenseEntry
 
-Regras principais:
-- Considera somente lançamentos ativos.
+Regras de negócio:
+- Considera somente lançamentos ativos (is_active = true).
 - Exclui despesas da aba FEEDING.
 - Exclui operações de armazenamento identificadas como ESTOCAR.
-- Soma os valores de acordo com a aba e o código de cada lançamento.
+- Soma os valores de acordo com a aba (tab) e o código de cada lançamento (line_code).
+- Grupos consolidados: despesas gerais, adiantamento, administração, arrendamento,
+  assistência técnica, compra de animais, compra de terras, consertos e reparos,
+  juros pagos, hormônios, impostos e taxas, medicamentos e vacinas, reposição
+  de cama, reprodução, sucedâneo, material de ordenha, leite para bezerros,
+  energia e combustíveis.
 
 Forma de consulta:
-SELECT *
-FROM analytics_mart.vw_expense;
-
+SELECT * FROM analytics_mart.vw_expense;
 */
 
 SELECT "ExpenseEntry".id_property,
