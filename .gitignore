@@ -1,6 +1,9 @@
 .idea
 .vscode
 .codex-audit/
+.codex_tmp/
+.codex-plugins/
+.agents/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
