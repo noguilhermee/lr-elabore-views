@@ -9,14 +9,12 @@ Granularidade:
 Uma linha por propriedade e mês (id_property + reference_month).
 
 Fontes principais:
-- DairyProduction
+- analytics_int.vw_int_dairy_production_base
 
 Regras de negócio:
-- Considera apenas registros da categoria LACTATION.
-- Expande cada registro para todos os meses de sua vigência.
+- Consome da view intermediária analytics_int.vw_int_dairy_production_base (já filtrada para categoria LACTATION e expandida mês a mês).
 - Quando existem vários registros no mesmo mês, seleciona o mais recente.
-- Sistemas avaliados: COMPOST_BARN, FREE_STALL, SEMI_CONFINED, PASTURE,
-  UNSTRUCTURED_CONFINMENT.
+- Sistemas avaliados: COMPOST_BARN, FREE_STALL, SEMI_CONFINED, PASTURE, UNSTRUCTURED_CONFINMENT.
 - Classifica como predominante o sistema com maior percentual.
 - Retorna MIXED quando dois ou mais sistemas possuem o mesmo maior percentual.
 
@@ -25,22 +23,19 @@ SELECT * FROM analytics_mart.vw_dairy_production_system_monthly;
 */
 
 WITH expanded_months AS (
-        SELECT dp.id_dairy,
-            dp.id_property,
-            dp.compost_barn,
-            dp.free_stall,
-            dp.semi_confined,
-            dp.pasture,
-            dp.unstructured_confinment,
-            dp.started_at,
-            dp.finished_at,
-            dp.created_at,
-            dp.updated_at,
-            gs.reference_month::date AS reference_month
-            
-            FROM "DairyProduction" dp
-                CROSS JOIN LATERAL generate_series(date_trunc('month'::text, dp.started_at)::date::timestamp with time zone, date_trunc('month'::text, LEAST(COALESCE(dp.finished_at, CURRENT_DATE::timestamp without time zone), CURRENT_DATE::timestamp without time zone))::date::timestamp with time zone, '1 mon'::interval) gs(reference_month)
-            WHERE dp.started_at IS NOT NULL AND dp.category::text = 'LACTATION'::text AND COALESCE(dp.finished_at, CURRENT_DATE::timestamp without time zone) >= dp.started_at
+        SELECT dpb.id_dairy,
+            dpb.id_property,
+            dpb.compost_barn,
+            dpb.free_stall,
+            dpb.semi_confined,
+            dpb.pasture,
+            dpb.unstructured_confinment,
+            dpb.started_at,
+            dpb.finished_at,
+            dpb.created_at,
+            dpb.updated_at,
+            dpb.reference_month
+            FROM analytics_int.vw_int_dairy_production_base dpb
     ), ranked_records AS (
         SELECT em.id_dairy,
             em.id_property,

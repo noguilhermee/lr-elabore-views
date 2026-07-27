@@ -1,0 +1,44 @@
+/*
+VIEW: analytics_int.vw_int_feeding_expense_base
+
+Finalidade:
+Camada intermediária de despesas de alimentação. Combina lançamentos de
+FeedingExpenseEntry e ExpenseEntry, converte unidades para quilogramas e projeta
+estritamente as colunas consumidas pela view analítica vw_feeding.
+
+Granularidade:
+Uma linha por item de despesa de alimentação (id_expense_entry).
+
+Fontes principais:
+- public.FeedingExpenseEntry
+- public.ExpenseEntry
+
+Regras de negócio:
+- Considera somente lançamentos ativos (ExpenseEntry.is_active = true).
+- Exclui operações de armazenamento (ESTOCAR).
+- Converte toneladas para kg (fator 1.000).
+- Converte saca ('feeding-unit-saca-1778245226249') para kg (fator 25).
+- Projeta estritamente as colunas consumidas por vw_feeding.
+
+Forma de consulta:
+SELECT * FROM analytics_int.vw_int_feeding_expense_base;
+*/
+
+SELECT f.id_property,
+    date_trunc('month'::text, e.reference_month)::date AS reference_month,
+    f.category_code,
+    (f.purchased_quantity * CASE
+        WHEN lower(TRIM(BOTH FROM e.unit)) = 'ton'::text THEN 1000
+        WHEN lower(TRIM(BOTH FROM e.unit)) = 'feeding-unit-saca-1778245226249'::text THEN 25
+        ELSE 1
+    END)::double precision AS purchased_quantity_kg,
+    (f.consumed_quantity * CASE
+        WHEN lower(TRIM(BOTH FROM e.unit)) = 'ton'::text THEN 1000
+        WHEN lower(TRIM(BOTH FROM e.unit)) = 'feeding-unit-saca-1778245226249'::text THEN 25
+        ELSE 1
+    END)::double precision AS consumed_quantity_kg,
+    e.amount_total
+FROM "FeedingExpenseEntry" f
+JOIN "ExpenseEntry" e ON f.id_expense_entry = e.id_expense_entry
+WHERE e.is_active = true 
+  AND f.operation <> 'ESTOCAR'::"ExpenseOperation";
