@@ -3,29 +3,25 @@ VIEW: analytics_mart.dim_consultor_propriedade
 
 Finalidade:
 Dimensão de relacionamento entre consultores e propriedades, identificando
-os vínculos operacionalmente ativos. Consome da bridge intermediária para
-evitar duplicação de lógica de deduplicação e vigência.
+os vínculos operacionalmente ativos. Consome da camada intermediária da propriedade.
 
 Granularidade:
 Uma linha por vínculo ativo entre consultor e propriedade.
 
 Fontes principais:
-- analytics_int.vw_bridge_property_consultant
+- analytics_int.vw_int_dim_property
 
 Regras de negócio:
-- Consome exclusivamente da bridge intermediária (analytics_int).
-- Filtra apenas vínculos operacionalmente ativos (is_current_operational).
-- Um consultor pode aparecer em várias propriedades.
-- Uma propriedade pode ter mais de um consultor vinculado.
-- A deduplicação de vínculos duplicados é feita na bridge (analytics_int).
+- Consome exclusivamente da view intermediária (analytics_int.vw_int_dim_property).
+- Seleciona apenas as propriedades que possuem consultor responsável cadastrado.
 
 Forma de consulta:
 SELECT * FROM analytics_mart.dim_consultor_propriedade;
 */
 
-SELECT bpc.id_consultant AS id_consultor,
-    bpc.consultant_name AS nome_consultor,
-    bpc.id_property
-    
-    FROM analytics_int.vw_bridge_property_consultant bpc
-    WHERE bpc.is_current_operational = true;
+SELECT p.id_consultant AS id_consultor,
+    p.consultant_name AS nome_consultor,
+    p.id_property
+
+FROM analytics_int.vw_int_dim_property p
+WHERE p.id_consultant IS NOT NULL;
