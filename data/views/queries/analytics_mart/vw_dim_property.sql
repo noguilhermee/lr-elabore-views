@@ -29,7 +29,7 @@ SELECT
     p.labor_rural_code,
     p.agroindustry_code,
     
-    -- Empreendedor / Produtor
+    -- Produtor
     p.id_entrepreneur,
     p.entrepreneur_name,
     
