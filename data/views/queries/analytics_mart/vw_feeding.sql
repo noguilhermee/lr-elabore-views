@@ -23,51 +23,15 @@ SELECT * FROM analytics_mart.vw_feeding;
 
 SELECT feb.id_property,
     feb.reference_month,
-    sum(
-        CASE
-            WHEN feb.category_code = 'VOLUMOSO'::text THEN feb.purchased_quantity_kg
-            ELSE 0::double precision
-        END) AS voluminous_purchased_quantity,
-    sum(
-        CASE
-            WHEN feb.category_code = 'VOLUMOSO'::text THEN feb.consumed_quantity_kg
-            ELSE 0::double precision
-        END) AS voluminous_consumed_quantity,
-    sum(
-        CASE
-            WHEN feb.category_code = 'VOLUMOSO'::text THEN feb.amount_total
-            ELSE 0::double precision
-        END) AS voluminous_amount_total,
-    sum(
-        CASE
-            WHEN feb.category_code = 'CONCENTRADO'::text THEN feb.purchased_quantity_kg
-            ELSE 0::double precision
-        END) AS concentrate_purchased_quantity,
-    sum(
-        CASE
-            WHEN feb.category_code = 'CONCENTRADO'::text THEN feb.consumed_quantity_kg
-            ELSE 0::double precision
-        END) AS concentrate_consumed_quantity,
-    sum(
-        CASE
-            WHEN feb.category_code = 'CONCENTRADO'::text THEN feb.amount_total
-            ELSE 0::double precision
-        END) AS concentrate_amount_total,
-    sum(
-        CASE
-            WHEN feb.category_code = 'MINERAIS'::text THEN feb.purchased_quantity_kg
-            ELSE 0::double precision
-        END) AS mineral_purchased_quantity,
-    sum(
-        CASE
-            WHEN feb.category_code = 'MINERAIS'::text THEN feb.consumed_quantity_kg
-            ELSE 0::double precision
-        END) AS mineral_consumed_quantity,
-    sum(
-        CASE
-            WHEN feb.category_code = 'MINERAIS'::text THEN feb.amount_total
-            ELSE 0::double precision
-        END) AS mineral_amount_total
+    sum(CASE WHEN feb.category_code = 'VOLUMOSO'   ::text THEN feb.purchased_quantity_kg ELSE 0::double precision END) AS voluminous_purchased_quantity,
+    sum(CASE WHEN feb.category_code = 'VOLUMOSO'   ::text THEN feb.consumed_quantity_kg  ELSE 0::double precision END) AS voluminous_consumed_quantity,
+    sum(CASE WHEN feb.category_code = 'VOLUMOSO'   ::text THEN feb.amount_total          ELSE 0::double precision END) AS voluminous_amount_total,
+    sum(CASE WHEN feb.category_code = 'CONCENTRADO'::text THEN feb.purchased_quantity_kg ELSE 0::double precision END) AS concentrate_purchased_quantity,
+    sum(CASE WHEN feb.category_code = 'CONCENTRADO'::text THEN feb.consumed_quantity_kg  ELSE 0::double precision END) AS concentrate_consumed_quantity,
+    sum(CASE WHEN feb.category_code = 'CONCENTRADO'::text THEN feb.amount_total          ELSE 0::double precision END) AS concentrate_amount_total,
+    sum(CASE WHEN feb.category_code = 'MINERAIS'   ::text THEN feb.purchased_quantity_kg ELSE 0::double precision END) AS mineral_purchased_quantity,
+    sum(CASE WHEN feb.category_code = 'MINERAIS'   ::text THEN feb.consumed_quantity_kg  ELSE 0::double precision END) AS mineral_consumed_quantity,
+    sum(CASE WHEN feb.category_code = 'MINERAIS'   ::text THEN feb.amount_total          ELSE 0::double precision END) AS mineral_amount_total
     
     FROM analytics_int.vw_int_feeding_expense feb
     GROUP BY feb.id_property, feb.reference_month

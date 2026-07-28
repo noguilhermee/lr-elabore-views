@@ -1,13 +1,37 @@
- SELECT a.id_property,
-    p.id_production AS id,
-    pc.id_culture,
-    pc.id_planted_culture,
-    date_trunc('month'::text, p.produced_at)::date AS reference_month,
-    p.harvested_area AS produced_area,
-    p.quantity_produced AS production,
-    p.produced_at AS harvest_date
-   FROM "Production" p
-     JOIN "PlantedCulture" pc ON p.id_planted_culture = pc.id_planted_culture
-     JOIN "Area" a ON pc.id_area = a.id_area
-  WHERE p.is_active = true AND pc.is_active = true
-  ORDER BY a.id_property, (date_trunc('month'::text, p.produced_at)::date);
+/*
+VIEW: analytics_mart.vw_production
+
+Finalidade:
+View analítica final de produção agrícola e colheitas em inglês, contendo os dados de plantio,
+colheita, áreas plantada/colhida, volume produzido, cultura e alimento colhido.
+
+Granularidade:
+Uma linha por registro de produção (id_production).
+
+Fontes principais:
+- analytics_int.vw_int_production
+
+Forma de consulta:
+SELECT * FROM analytics_mart.vw_production;
+*/
+
+SELECT pr.id_property,
+    pr.id_production AS id,
+    pr.id_culture,
+    pr.id_planted_culture,
+    pr.id_culture_harvest_product,
+    pr.reference_month,
+    
+    -- Datas e Áreas
+    pr.planted_at,
+    pr.harvest_date,
+    pr.planted_area,
+    pr.harvested_area,
+    pr.production,
+    
+    -- Cultura e Produto Colhido
+    pr.culture_name,
+    pr.harvest_product_name
+
+FROM analytics_int.vw_int_production pr
+ORDER BY pr.id_property, pr.reference_month;
