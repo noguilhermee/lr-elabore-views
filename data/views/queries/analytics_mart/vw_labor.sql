@@ -9,10 +9,10 @@ Granularidade:
 Uma linha por propriedade e mês (id_property + reference_month).
 
 Fontes principais:
-- analytics_int.vw_int_expense_base
+- analytics_int.vw_int_expense
 
 Regras de negócio:
-- Consome da view intermediária analytics_int.vw_int_expense_base (já filtrada por is_active = true e sem ESTOCAR).
+- Consome da view intermediária analytics_int.vw_int_expense (já filtrada por is_active = true e sem ESTOCAR).
 - Combina lançamentos das abas LABOR e OWN_MILK.
 - Agrupa diferentes tipos de trabalhadores contratados em um único indicador.
 - Indicadores: despesa e quantidade de mão de obra familiar, despesa e
@@ -38,7 +38,8 @@ SELECT eb.id_property,
         END) AS family_labor_quantity,
     sum(
         CASE
-            WHEN eb.tab = 'LABOR'::"ExpenseTab" AND (eb.line_code = ANY (ARRAY['hired-general'::text, 'hired-milker'::text, 'hired-relief'::text, 'hired-tractor'::text, 'labor-charges'::text, 'labor-others'::text])) OR eb.tab = 'OWN_MILK'::"ExpenseTab" AND eb.line_code = 'hired-labor'::text THEN eb.amount_total
+            WHEN eb.tab = 'LABOR'::"ExpenseTab" AND (eb.line_code = ANY (ARRAY['hired-general'::text, 'hired-milker'::text, 'hired-relief'::text, 'hired-tractor'::text, 'labor-charges'::text, 'labor-others'::text]))
+              OR eb.tab = 'OWN_MILK'::"ExpenseTab" AND eb.line_code = 'hired-labor'::text THEN eb.amount_total
             ELSE 0::double precision
         END) AS hired_labor_expenses,
     sum(
@@ -46,8 +47,8 @@ SELECT eb.id_property,
             WHEN eb.tab = 'LABOR'::"ExpenseTab" AND (eb.line_code = ANY (ARRAY['hired-general'::text, 'hired-milker'::text, 'hired-relief'::text, 'hired-tractor'::text, 'labor-charges'::text, 'labor-others'::text])) THEN COALESCE(eb.quantity, 0::double precision)
             ELSE 0::double precision
         END) AS hired_labor_quantity
-    
-    FROM analytics_int.vw_int_expense_base eb
+
+    FROM analytics_int.vw_int_expense eb
     WHERE eb.tab = ANY (ARRAY['LABOR'::"ExpenseTab", 'OWN_MILK'::"ExpenseTab"])
     GROUP BY eb.id_property, eb.reference_month
     ORDER BY eb.id_property, eb.reference_month;

@@ -9,10 +9,10 @@ Granularidade:
 Uma linha por ativo e mês (id_asset + reference_month).
 
 Fontes principais:
-- analytics_int.vw_int_asset_base
+- analytics_int.vw_int_asset
 
 Regras de negócio:
-- Consome da view intermediária canônica analytics_int.vw_int_asset_base (já expandida mês a mês com revisões de valor LATERAL e depreciação calculada).
+- Consome da view intermediária canônica analytics_int.vw_int_asset (já expandida mês a mês com revisões de valor LATERAL e depreciação calculada).
 - O estoque bruto não é reduzido pela depreciação acumulada.
 - Esta view é a definição canônica da lógica; a materialized view
   mvw_asset_capital_stock contém a mesma lógica para performance.
@@ -34,4 +34,4 @@ SELECT ab.id_asset,
     ab.down_payment,
     ab.gross_capital_stock,
     ab.monthly_depreciation
-FROM analytics_int.vw_int_asset_base ab;
+FROM analytics_int.vw_int_asset ab;

@@ -9,10 +9,10 @@ Granularidade:
 Uma linha por propriedade e mês (id_property + reference_month).
 
 Fontes principais:
-- analytics_int.vw_int_cattle_base
+- analytics_int.vw_int_cattle
 
 Regras de negócio:
-- Consome da view intermediária analytics_int.vw_int_cattle_base (já com datas mensais calculadas e categorias ativas).
+- Consome da view intermediária analytics_int.vw_int_cattle (já com datas mensais calculadas e categorias ativas).
 - Categorias consolidadas: vacas em lactação, vacas secas, aleitamento,
   recria, machos, outras categorias.
 - Indicadores derivados: total de vacas, total do rebanho, valores por categoria.
@@ -38,6 +38,6 @@ SELECT cb.id_property,
     sum( CASE WHEN cb.category_name = 'Macho'::text THEN cb.total_value ELSE 0::double precision END) AS males_value,
     sum( CASE WHEN cb.category_name = 'Outras categorias'::text THEN cb.total_value ELSE 0::double precision END) AS other_categories_value
     
-    FROM analytics_int.vw_int_cattle_base cb
+    FROM analytics_int.vw_int_cattle cb
     GROUP BY cb.id_property, cb.reference_month
     ORDER BY cb.id_property, cb.reference_month;

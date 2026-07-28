@@ -1,5 +1,5 @@
 /*
-VIEW: analytics_int.vw_int_feeding_expense_base
+VIEW: analytics_int.vw_int_feeding_expense
 
 Finalidade:
 Camada intermediária de despesas de alimentação. Combina lançamentos de
@@ -21,7 +21,7 @@ Regras de negócio:
 - Projeta estritamente as colunas consumidas por vw_feeding.
 
 Forma de consulta:
-SELECT * FROM analytics_int.vw_int_feeding_expense_base;
+SELECT * FROM analytics_int.vw_int_feeding_expense;
 */
 
 SELECT f.id_property,

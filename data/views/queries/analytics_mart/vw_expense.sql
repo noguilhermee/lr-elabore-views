@@ -9,10 +9,10 @@ Granularidade:
 Uma linha por propriedade e mês (id_property + reference_month).
 
 Fontes principais:
-- analytics_int.vw_int_expense_base
+- analytics_int.vw_int_expense
 
 Regras de negócio:
-- Consome da view intermediária analytics_int.vw_int_expense_base (já filtrada por is_active = true e sem ESTOCAR).
+- Consome da view intermediária analytics_int.vw_int_expense (já filtrada por is_active = true e sem ESTOCAR).
 - Exclui despesas da aba FEEDING.
 - Soma os valores de acordo com a aba (tab) e o código de cada lançamento (line_code).
 - Grupos consolidados: despesas gerais, adiantamento, administração, arrendamento,
@@ -124,7 +124,7 @@ SELECT eb.id_property,
             ELSE 0::double precision
         END) AS fuel
     
-    FROM analytics_int.vw_int_expense_base eb
+    FROM analytics_int.vw_int_expense eb
     WHERE eb.tab <> 'FEEDING'::"ExpenseTab"
     GROUP BY eb.id_property, eb.reference_month
     ORDER BY eb.id_property, eb.reference_month;

@@ -9,10 +9,10 @@ Granularidade:
 Uma linha por propriedade e mês (id_property + reference_month).
 
 Fontes principais:
-- analytics_int.vw_int_expense_base
+- analytics_int.vw_int_expense
 
 Regras de negócio:
-- Consome da view intermediária analytics_int.vw_int_expense_base (já filtrada por is_active = true e sem ESTOCAR).
+- Consome da view intermediária analytics_int.vw_int_expense (já filtrada por is_active = true e sem ESTOCAR).
 - Considera apenas registros da aba OWN_MILK.
 - Utiliza o maior preço unitário encontrado no mês (MAX, não média ponderada).
 - Indicadores: preço unitário do leite, leite para mão de obra contratada,
@@ -67,7 +67,7 @@ SELECT eb.id_property,
             ELSE 0::double precision
         END) AS family_labor_amount_total
     
-    FROM analytics_int.vw_int_expense_base eb
+    FROM analytics_int.vw_int_expense eb
     WHERE eb.tab = 'OWN_MILK'::"ExpenseTab"
     GROUP BY eb.id_property, eb.reference_month
     ORDER BY eb.id_property, eb.reference_month;

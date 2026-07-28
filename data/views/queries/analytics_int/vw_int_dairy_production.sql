@@ -1,5 +1,5 @@
 /*
-VIEW: analytics_int.vw_int_dairy_production_base
+VIEW: analytics_int.vw_int_dairy_production
 
 Finalidade:
 Camada intermediária de sistemas de produção de leite. Expande o histórico dos
@@ -17,7 +17,7 @@ Regras de negócio:
 - Serve como base padronizada para a view analítica: vw_dairy_production_system_monthly.
 
 Forma de consulta:
-SELECT * FROM analytics_int.vw_int_dairy_production_base;
+SELECT * FROM analytics_int.vw_int_dairy_production;
 */
 
 SELECT dp.id_dairy,

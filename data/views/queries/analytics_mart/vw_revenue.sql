@@ -9,10 +9,10 @@ Granularidade:
 Uma linha por propriedade e mês (id_property + reference_month).
 
 Fontes principais:
-- analytics_int.vw_int_revenue_base
+- analytics_int.vw_int_revenue
 
 Regras de negócio:
-- Consome da view intermediária analytics_int.vw_int_revenue_base (já filtrada por is_active = true e com JSONs extraídos).
+- Consome da view intermediária analytics_int.vw_int_revenue (já filtrada por is_active = true e com JSONs extraídos).
 - Soma as receitas conforme o tipo do lançamento (RevenueType).
 - Utiliza MAX (não média ponderada) para milk_unit_price, CCS, CPP, gordura e proteína.
 - Utiliza MAX (não soma) para volume de derivados.
@@ -118,6 +118,6 @@ SELECT rb.id_property,
             ELSE 0::double precision
         END) AS surplus_division
     
-    FROM analytics_int.vw_int_revenue_base rb
+    FROM analytics_int.vw_int_revenue rb
     GROUP BY rb.id_property, rb.reference_month
     ORDER BY rb.id_property, rb.reference_month;

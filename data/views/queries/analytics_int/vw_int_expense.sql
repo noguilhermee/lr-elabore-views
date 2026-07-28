@@ -1,5 +1,5 @@
 /*
-VIEW: analytics_int.vw_int_expense_base
+VIEW: analytics_int.vw_int_expense
 
 Finalidade:
 Camada intermediária de despesas operacionais. Filtra lançamentos ativos,
@@ -19,7 +19,7 @@ Regras de negócio:
 - Projeta estritamente as colunas consumidas por vw_expense, vw_labor e vw_own_milk.
 
 Forma de consulta:
-SELECT * FROM analytics_int.vw_int_expense_base;
+SELECT * FROM analytics_int.vw_int_expense;
 */
 
 SELECT e.id_expense_entry,

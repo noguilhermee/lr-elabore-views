@@ -9,10 +9,10 @@ Granularidade:
 Uma linha por propriedade e mês (id_property + reference_month).
 
 Fontes principais:
-- analytics_int.vw_int_feeding_expense_base
+- analytics_int.vw_int_feeding_expense
 
 Regras de negócio:
-- Consome da view intermediária analytics_int.vw_int_feeding_expense_base (já filtrada por is_active = true, sem ESTOCAR e com unidades convertidas).
+- Consome da view intermediária analytics_int.vw_int_feeding_expense (já filtrada por is_active = true, sem ESTOCAR e com unidades convertidas).
 - Agrupa todas as quantidades e valores em nível mensal por propriedade.
 - Indicadores: quantidade comprada (kg), quantidade consumida (kg) e valor total (R$),
   separados entre volumoso, concentrado e mineral.
@@ -69,6 +69,6 @@ SELECT feb.id_property,
             ELSE 0::double precision
         END) AS mineral_amount_total
     
-    FROM analytics_int.vw_int_feeding_expense_base feb
+    FROM analytics_int.vw_int_feeding_expense feb
     GROUP BY feb.id_property, feb.reference_month
     ORDER BY feb.id_property, feb.reference_month;

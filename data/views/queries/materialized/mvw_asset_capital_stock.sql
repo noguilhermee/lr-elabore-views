@@ -16,11 +16,11 @@ Indicadores calculados:
 - Valor da entrada do ativo
 
 Regras principais:
-- Consome da view intermediária canônica analytics_int.vw_int_asset_base.
+- Consome da view intermediária canônica analytics_int.vw_int_asset.
 - Mantém a mesma estrutura de colunas da view canônica para alta performance.
 
 Fontes principais:
-- analytics_int.vw_int_asset_base
+- analytics_int.vw_int_asset
 
 Forma de consulta:
 SELECT *
@@ -43,4 +43,4 @@ SELECT ab.id_asset,
     ab.down_payment,
     ab.gross_capital_stock,
     ab.monthly_depreciation
-FROM analytics_int.vw_int_asset_base ab;
+FROM analytics_int.vw_int_asset ab;

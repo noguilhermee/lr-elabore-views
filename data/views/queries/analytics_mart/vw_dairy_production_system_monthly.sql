@@ -9,10 +9,10 @@ Granularidade:
 Uma linha por propriedade e mês (id_property + reference_month).
 
 Fontes principais:
-- analytics_int.vw_int_dairy_production_base
+- analytics_int.vw_int_dairy_production
 
 Regras de negócio:
-- Consome da view intermediária analytics_int.vw_int_dairy_production_base (já filtrada para categoria LACTATION e expandida mês a mês).
+- Consome da view intermediária analytics_int.vw_int_dairy_production (já filtrada para categoria LACTATION e expandida mês a mês).
 - Quando existem vários registros no mesmo mês, seleciona o mais recente.
 - Sistemas avaliados: COMPOST_BARN, FREE_STALL, SEMI_CONFINED, PASTURE, UNSTRUCTURED_CONFINMENT.
 - Classifica como predominante o sistema com maior percentual.
@@ -35,7 +35,7 @@ WITH expanded_months AS (
             dpb.created_at,
             dpb.updated_at,
             dpb.reference_month
-            FROM analytics_int.vw_int_dairy_production_base dpb
+            FROM analytics_int.vw_int_dairy_production dpb
     ), ranked_records AS (
         SELECT em.id_dairy,
             em.id_property,

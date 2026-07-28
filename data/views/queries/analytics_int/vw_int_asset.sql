@@ -1,5 +1,5 @@
 /*
-VIEW: analytics_int.vw_int_asset_base
+VIEW: analytics_int.vw_int_asset
 
 Finalidade:
 Camada intermediária de patrimônio e estoque de capital. Expande o histórico dos
@@ -23,7 +23,7 @@ Regras de negócio:
 - Serve como base canônica para as views analíticas: vw_asset_capital_stock e mvw_asset_capital_stock.
 
 Forma de consulta:
-SELECT * FROM analytics_int.vw_int_asset_base;
+SELECT * FROM analytics_int.vw_int_asset;
 */
 
 WITH asset_months AS (

@@ -1,5 +1,5 @@
 /*
-VIEW: analytics_int.vw_int_revenue_base
+VIEW: analytics_int.vw_int_revenue
 
 Finalidade:
 Camada intermediária de receitas. Filtra lançamentos ativos, normaliza a data
@@ -20,7 +20,7 @@ Regras de negócio:
 - Projeta estritamente as colunas consumidas por vw_revenue.
 
 Forma de consulta:
-SELECT * FROM analytics_int.vw_int_revenue_base;
+SELECT * FROM analytics_int.vw_int_revenue;
 */
 
 SELECT r.id_property,

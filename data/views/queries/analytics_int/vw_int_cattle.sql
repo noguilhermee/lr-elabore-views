@@ -1,5 +1,5 @@
 /*
-VIEW: analytics_int.vw_int_cattle_base
+VIEW: analytics_int.vw_int_cattle
 
 Finalidade:
 Camada intermediária do rebanho bovino. Junta inventário com períodos e categorias,
@@ -22,7 +22,7 @@ Regras de negócio:
 - Projeta estritamente as colunas consumidas por vw_cattle.
 
 Forma de consulta:
-SELECT * FROM analytics_int.vw_int_cattle_base;
+SELECT * FROM analytics_int.vw_int_cattle;
 */
 
 SELECT cp.id_property,

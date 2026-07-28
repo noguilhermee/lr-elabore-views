@@ -74,7 +74,7 @@ CHECKPOINT_FILE = 'sharepoint_checkpoint.json'
 # Formatar excel
 #
 
-def formatar_excel(arquivo_excel):
+def formatar_excel(arquivo_excel, max_linhas_amostra=100):
     wb = load_workbook(arquivo_excel)
 
     fonte_padrao    = Font(name="Aptos", size=10)
@@ -90,29 +90,36 @@ def formatar_excel(arquivo_excel):
         ws.sheet_format.customHeight = True
 
         # Primeira linha: altura e cabeçalho
-        ws.row_dimensions[1].height = 30
-        for cell in ws[1]:
-            cell.font = fonte_cabecalho
-            cell.alignment = alinhamento_centro
+        if ws.max_row and ws.max_row >= 1:
+            ws.row_dimensions[1].height = 30
+            for cell in ws[1]:
+                cell.font = fonte_cabecalho
+                cell.alignment = alinhamento_centro
 
-        # Largura e fonte por coluna inteira (evita iter_rows célula a célula)
-        for col_idx, column_cells in enumerate(ws.columns, start=1):
-            col_letter = get_column_letter(col_idx)
-            max_length = 0
-
-            for cell in column_cells:
-                # Aplicar fonte e alinhamento (só nas linhas de dados, cabeçalho já foi feito)
-                if cell.row > 1:
+        # Formatar células de dados em 1 passagem única
+        if ws.max_row and ws.max_row >= 2:
+            for row in ws.iter_rows(min_row=2):
+                for cell in row:
                     cell.font = fonte_padrao
                     cell.alignment = alinhamento_centro
 
-                if cell.value is not None:
-                    max_length = max(max_length, len(str(cell.value)))
+        # Largura por amostragem das N primeiras linhas (evita iterar centenas de milhares de células)
+        total_rows = ws.max_row or 0
+        total_cols = ws.max_column or 0
+        linhas_amostra = range(1, min(total_rows + 1, max_linhas_amostra + 1))
+
+        for col_idx in range(1, total_cols + 1):
+            col_letter = get_column_letter(col_idx)
+            max_length = 0
+            for r in linhas_amostra:
+                val = ws.cell(row=r, column=col_idx).value
+                if val is not None:
+                    max_length = max(max_length, len(str(val)))
 
             ws.column_dimensions[col_letter].width = min(max(max_length + 2, 12), 45)
 
         # Filtro
-        if ws.max_row > 1 and ws.max_column > 1:
+        if total_rows > 1 and total_cols > 1:
             ws.auto_filter.ref = ws.dimensions
 
     wb.save(arquivo_excel)
