@@ -2,9 +2,9 @@
 VIEW: analytics_int.vw_int_forage_production
 
 Finalidade:
-Camada intermediária de produção agrícola e forragens com vínculo de custo.
-Consolida os dados de plantio, colheita, áreas, volumes produzidos e
-agrega os custos totais acumulados e mensais das culturas correspondentes.
+Camada intermediária de produção agrícola e forragens bruta para análise e deflação.
+Consolida os dados de plantio, colheita (harvest_date), áreas plantadas/colhidas, total colhido por plantio,
+volume produzido, cultura, produto colhido, categoria alimentar (feeding_category) e rendimento (yield_kg_per_ha).
 
 Granularidade:
 Uma linha por registro de produção agrícola ativo (id_production).
@@ -17,15 +17,6 @@ Fontes principais:
 - public.CultureHarvestProduct
 - public.CultureExpenseManagement
 - public.CultureExpenseManagementProduct
-
-Regras de negócio:
-- Considera apenas lançamentos ativos de produção (Production.is_active = true) e plantio (PlantedCulture.is_active = true).
-- Associa os custos de manejo (CultureExpenseManagementProduct) agregados por cultura e área no mês.
-- Normaliza a data de referência mensal para o primeiro dia do mês da colheita.
-- Calcula o rendimento (produção / área colhida) e custo unitário por kg (custo / produção).
-
-Forma de consulta:
-SELECT * FROM analytics_int.vw_int_forage_production;
 */
 
 WITH forage_costs AS (
@@ -33,14 +24,23 @@ WITH forage_costs AS (
         cem.id_property,
         cem.id_culture,
         cem.id_area,
+        cemp.stage,
         date_trunc('month'::text, COALESCE(cemp.applied_at, cem.created_at))::date AS reference_month,
-        SUM(COALESCE(cemp.line_total, 0::double precision)) AS monthly_cost
+        SUM(COALESCE(cemp.line_total, 0::double precision)) AS total_monthly_cost
     FROM "CultureExpenseManagementProduct" cemp
     JOIN "CultureExpenseManagement" cem ON cemp.id_management = cem.id_management
     WHERE cem.is_active = true 
       AND cemp.is_active = true
       AND COALESCE(cemp.operation::text, ''::text) <> 'ESTOCAR'::text
-    GROUP BY cem.id_property, cem.id_culture, cem.id_area, date_trunc('month'::text, COALESCE(cemp.applied_at, cem.created_at))::date
+    GROUP BY cem.id_property, cem.id_culture, cem.id_area, cemp.stage, date_trunc('month'::text, COALESCE(cemp.applied_at, cem.created_at))::date
+),
+harvested_culture_totals AS (
+    SELECT 
+        p.id_planted_culture,
+        SUM(COALESCE(p.harvested_area, 0::double precision)) AS total_harvested_area
+    FROM "Production" p
+    WHERE p.is_active = true
+    GROUP BY p.id_planted_culture
 )
 SELECT 
     a.id_property,
@@ -57,22 +57,19 @@ SELECT
     -- Áreas e Produção
     pc.planted_area,
     p.harvested_area,
+    COALESCE(hct.total_harvested_area, 0::double precision) AS total_harvested_area,
     p.quantity_produced AS production,
     
-    -- Cultura e Alimento Colhido
+    -- Cultura, Alimento Colhido e Categoria Alimentar
     c.name AS culture_name,
     chp.name AS harvest_product_name,
+    chp.feeding_category,
     
-    -- Custos e Produtividade
-    COALESCE(fc.monthly_cost, 0::double precision) AS monthly_forage_cost,
+    -- Rendimento (kg/ha)
     CASE 
         WHEN p.harvested_area > 0 THEN round((p.quantity_produced / p.harvested_area)::numeric, 2)::double precision 
         ELSE 0::double precision 
-    END AS yield_kg_per_ha,
-    CASE 
-        WHEN p.quantity_produced > 0 THEN round((COALESCE(fc.monthly_cost, 0::double precision) / p.quantity_produced)::numeric, 4)::double precision 
-        ELSE 0::double precision 
-    END AS cost_per_kg
+    END AS yield_kg_per_ha
 
 FROM "Production" p
 JOIN "PlantedCulture" pc ON p.id_planted_culture = pc.id_planted_culture
@@ -83,5 +80,6 @@ LEFT JOIN forage_costs fc ON pc.id_culture = fc.id_culture
                          AND pc.id_area = fc.id_area 
                          AND a.id_property = fc.id_property 
                          AND date_trunc('month'::text, p.produced_at)::date = fc.reference_month
+LEFT JOIN harvested_culture_totals hct ON p.id_planted_culture = hct.id_planted_culture
 WHERE p.is_active = true 
   AND pc.is_active = true;

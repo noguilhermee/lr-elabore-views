@@ -16,7 +16,7 @@ SELECT * FROM analytics_mart.vw_production;
 */
 
 SELECT pr.id_property,
-    pr.id_production AS id,
+    pr.id_production,
     pr.id_culture,
     pr.id_planted_culture,
     pr.id_culture_harvest_product,
@@ -32,6 +32,6 @@ SELECT pr.id_property,
     -- Cultura e Produto Colhido
     pr.culture_name,
     pr.harvest_product_name
-
+    
 FROM analytics_int.vw_int_production pr
 ORDER BY pr.id_property, pr.reference_month;
