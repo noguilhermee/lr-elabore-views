@@ -2,10 +2,10 @@
 VIEW: analytics_int.vw_int_forage_cost_items
 
 Finalidade:
-Camada intermediária para itens de custo de culturas e forrageiras.
-Combina os lançamentos de gestão de cultura e produtos aplicados, vincula o plantio (PlantedCulture)
-e o produto colhido (CultureHarvestProduct para recuperar a categoria alimentar feeding_category),
-normaliza a data de referência mensal e filtra lançamentos ativos e válidos.
+Camada intermediária para itens brutos de custo de manejo de culturas e forrageiras.
+Combina os lançamentos de gestão de cultura e produtos aplicados (insumos, fertilizantes, sementes, serviços),
+vincula o plantio (PlantedCulture), a cultura (Culture) e a área (Area), normaliza a data de referência mensal
+(reference_month) pela data de aplicação e filtra lançamentos ativos.
 
 Granularidade:
 Uma linha por item de produto aplicado (id_management_product).
@@ -15,25 +15,20 @@ Fontes principais:
 - public.CultureExpenseManagement
 - public.PlantedCulture
 - public.Culture
-- public.CultureHarvestProduct
-
-Forma de consulta:
-SELECT * FROM analytics_int.vw_int_forage_cost_items;
 */
 
 SELECT 
     cem.id_property,
-    cemp.id_management_product,
-    cemp.id_culture_expense_item,
-    cem.id_management,
     pc.id_planted_culture,
     cem.id_culture,
     cem.id_area,
+    cem.id_management,
+    cemp.id_management_product,
+    cemp.id_culture_expense_item,
     date_trunc('month'::text, COALESCE(cemp.applied_at, cem.created_at))::date AS reference_month,
+    pc.planted_at,
     cemp.applied_at,
     c.name AS culture_name,
-    chp.name AS harvest_product_name,
-    chp.feeding_category,
     cemp.product_name,
     cemp.category,
     cemp.stage,
@@ -49,7 +44,6 @@ FROM "CultureExpenseManagementProduct" cemp
 JOIN "CultureExpenseManagement" cem ON cemp.id_management = cem.id_management
 LEFT JOIN "PlantedCulture" pc ON cem.id_area = pc.id_area AND cem.id_culture = pc.id_culture AND pc.is_active = true
 LEFT JOIN "Culture" c ON cem.id_culture = c.id_culture
-LEFT JOIN "CultureHarvestProduct" chp ON c.id_culture = chp.id_culture AND chp.is_active = true
 WHERE cem.is_active = true 
   AND cemp.is_active = true 
   AND COALESCE(cemp.operation::text, ''::text) <> 'ESTOCAR'::text;

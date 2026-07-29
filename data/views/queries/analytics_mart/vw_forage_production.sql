@@ -16,8 +16,8 @@ Fontes principais:
 SELECT 
     fp.id_property,
     fp.id_production,
-    fp.id_culture,
     fp.id_planted_culture,
+    fp.id_culture,
     fp.id_culture_harvest_product,
     fp.reference_month,
     
@@ -36,6 +36,6 @@ SELECT
     
     -- Rendimento (kg/ha)
     fp.yield_kg_per_ha
-
+    
 FROM analytics_int.vw_int_forage_production fp
 ORDER BY fp.id_property, fp.reference_month;

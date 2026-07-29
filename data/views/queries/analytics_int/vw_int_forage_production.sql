@@ -4,7 +4,8 @@ VIEW: analytics_int.vw_int_forage_production
 Finalidade:
 Camada intermediária de produção agrícola e forragens bruta para análise e deflação.
 Consolida os dados de plantio, colheita (harvest_date), áreas plantadas/colhidas, total colhido por plantio,
-volume produzido, cultura, produto colhido, categoria alimentar (feeding_category) e rendimento (yield_kg_per_ha).
+volume produzido, cultura, produto colhido específico registrado nos metadados da colheita (product_name em observation),
+categoria alimentar (feeding_category) e rendimento (yield_kg_per_ha).
 
 Granularidade:
 Uma linha por registro de produção agrícola ativo (id_production).
@@ -48,13 +49,11 @@ SELECT
     p.id_planted_culture,
     pc.id_culture,
     chp.id_culture_harvest_product,
-    
-    -- Datas
     date_trunc('month'::text, p.produced_at)::date AS reference_month,
+    
+    -- Datas e Áreas
     pc.planted_at,
     p.produced_at AS harvest_date,
-    
-    -- Áreas e Produção
     pc.planted_area,
     p.harvested_area,
     COALESCE(hct.total_harvested_area, 0::double precision) AS total_harvested_area,
@@ -75,7 +74,13 @@ FROM "Production" p
 JOIN "PlantedCulture" pc ON p.id_planted_culture = pc.id_planted_culture
 JOIN "Area" a ON pc.id_area = a.id_area
 LEFT JOIN "Culture" c ON pc.id_culture = c.id_culture
-LEFT JOIN "CultureHarvestProduct" chp ON c.id_culture = chp.id_culture AND chp.is_active = true
+LEFT JOIN "CultureHarvestProduct" chp ON c.id_culture = chp.id_culture 
+    AND chp.is_active = true
+    AND (
+        p.observation IS NULL 
+        OR p.observation NOT LIKE '%"product_name":%' 
+        OR chp.name = substring(p.observation from '"product_name":"([^"]+)"')
+    )
 LEFT JOIN forage_costs fc ON pc.id_culture = fc.id_culture 
                          AND pc.id_area = fc.id_area 
                          AND a.id_property = fc.id_property 
