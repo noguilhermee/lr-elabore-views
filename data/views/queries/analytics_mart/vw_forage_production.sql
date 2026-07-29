@@ -2,17 +2,13 @@
 VIEW: analytics_mart.vw_forage_production
 
 Finalidade:
-View analítica de produção de forrageiras e culturas agrícolas em formato bruto para deflação e análise,
+View analítica de produção de forrageiras e culturas agrícolas em formato bruto para análise,
 contendo dados de áreas plantada/colhida, área colhida total por plantio, volume produzido, alimento colhido,
 categoria alimentar (feeding_category) e rendimento (yield_kg_per_ha).
 
 Granularidade:
 Uma linha por registro de produção (id_production).
-
-Fontes principais:
-- analytics_int.vw_int_forage_production
 */
-
 SELECT 
     fp.id_property,
     fp.id_production,
@@ -36,6 +32,6 @@ SELECT
     
     -- Rendimento (kg/ha)
     fp.yield_kg_per_ha
-    
+
 FROM analytics_int.vw_int_forage_production fp
 ORDER BY fp.id_property, fp.reference_month;
