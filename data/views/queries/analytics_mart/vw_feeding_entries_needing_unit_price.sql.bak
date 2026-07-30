@@ -1,0 +1,31 @@
+DROP VIEW IF EXISTS analytics_mart.vw_feeding_entries_needing_unit_price;
+
+CREATE VIEW analytics_mart.vw_feeding_entries_needing_unit_price AS
+ WITH producao AS (
+         SELECT s.id_stock_control_item,
+            s.source_reference_id AS id_production,
+            p.id_property,
+            p.id_planted_culture,
+            p.id_culture_harvest_product
+           FROM "StockControlMovement" s
+             JOIN analytics_mart.vw_forage_production p ON s.source_reference_id = p.id_production
+          WHERE s.source_module = 'PLANTED_CULTURE_PRODUCTION'::text AND s.movement_type = 'ENTRY'::"StockControlMovementType"
+        ), consumo AS (
+         SELECT s.id_stock_control_item,
+            s.source_reference_id AS id_expense_entry
+           FROM "StockControlMovement" s
+          WHERE s.source_module = 'EXPENSES'::text AND s.movement_type = 'EXIT'::"StockControlMovementType"
+        )
+ SELECT f.id_expense_entry,
+    prod.id_property,
+    f.consumed_quantity,
+    f.unit_price AS current_unit_price,
+    date_trunc('month'::text, e.reference_month)::date AS consumption_reference_month,
+    prod.id_production,
+    prod.id_planted_culture,
+    prod.id_culture_harvest_product
+   FROM consumo c
+     JOIN producao prod ON c.id_stock_control_item = prod.id_stock_control_item
+     JOIN "FeedingExpenseEntry" f ON c.id_expense_entry = f.id_expense_entry
+     JOIN "ExpenseEntry" e ON f.id_expense_entry = e.id_expense_entry
+  WHERE f.unit_price = 0::double precision AND f.id_property = prod.id_property;

@@ -77,6 +77,7 @@ Escreva nomes de variáveis, comentários e documentação em português quando 
 - Não deixe segredos, tokens, senhas, URLs com credenciais ou conteúdo do `.env` nas células, saídas ou logs.
 - Ao salvar notebooks, remova saídas volumosas ou sensíveis que não sejam necessárias para compreender o resultado.
 - Não faça alterações mecânicas em todo o JSON de um notebook quando somente uma célula precisa mudar.
+- **Backup Obrigatório Antes de Modificar/Substituir Arquivos**: Sempre que for alterar ou substituir o conteúdo de um notebook ou arquivo existente, crie antes uma cópia de segurança (em `app/backup/` ou com sufixo `.bak`) para preservar o histórico local e evitar perda de edições.
 
 ## Exportações
 
