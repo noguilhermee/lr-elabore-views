@@ -4,7 +4,7 @@ VIEW: analytics_int.vw_int_feeding_expense
 Finalidade:
 Camada intermediária de despesas de alimentação. Combina lançamentos de
 FeedingExpenseEntry e ExpenseEntry, converte unidades para quilogramas e projeta
-as colunas consumidas pelas views filhas e analíticas.
+estritamente as colunas consumidas pela view analítica vw_feeding.
 
 Granularidade:
 Uma linha por item de despesa de alimentação (id_expense_entry).
@@ -18,15 +18,12 @@ Regras de negócio:
 - Exclui operações de armazenamento (ESTOCAR).
 - Converte toneladas para kg (fator 1.000).
 - Converte saca ('feeding-unit-saca-1778245226249') para kg (fator 25).
-- Projeta id_expense_entry e unit_price para consumo de views auxiliares de precificação.
+- Projeta estritamente as colunas consumidas por vw_feeding.
 
 Forma de consulta:
 SELECT * FROM analytics_int.vw_int_feeding_expense;
 */
 
-DROP VIEW IF EXISTS analytics_int.vw_int_feeding_expense CASCADE;
-
-CREATE VIEW analytics_int.vw_int_feeding_expense AS
 SELECT 
     f.id_expense_entry,
     f.id_property,
