@@ -129,6 +129,38 @@ Biblioteca interna com utilitários para:
 
 ---
 
+## 🛡️ Regras de Consistência e Qualidade dos Dados
+
+Durante o processamento mensal, cada registro é avaliado contra **13 critérios de consistência técnica e econômica**.
+
+### 📊 Critérios Avaliados:
+
+| Categoria | Critério / Coluna | Faixa / Limite de Consistência |
+| :--- | :--- | :--- |
+| **Qualidade do Leite** | `cons_ccs` | Contagem de células somáticas **> 50** |
+| | `cons_cpp` | Contagem padrão em placas **> 1** |
+| | `cons_fat` | Percentual de gordura entre **2,5% e 5,5%** |
+| | `cons_protein` | Percentual de proteína entre **2,4% e 4,5%** |
+| **Estrutura do Rebanho** | `cons_lactating_cows_total_cows` | Vacas em lactação / Total de vacas entre **20% e 99%** |
+| | `cons_lactating_cows_total_cattle` | Vacas em lactação / Rebanho total entre **15% e 99%** |
+| **Produtividade e MDO** | `cons_milk_lactating_cow_day` | Produção diária por vaca em lactação entre **3 e 45 L/vaca/dia** |
+| | `cons_milk_total_labor_day` | Produção diária por MDO entre **20 e 1.500 L/trabalhador/dia** |
+| | `cons_lactating_cows_total_labor` | Vacas em lactação por MDO entre **0 e 70 vacas/trabalhador** |
+| **Alimentação e Custos** | `cons_feeding_cost_milk_price` | Custo de alimentação / Preço do leite entre **15% e 150%** |
+| | `cons_voluminous_cost_liter` | Custo de volumoso **< R$ 3,00/L** |
+| | `cons_concentrate_mineral_cost_liter` | Custo de concentrado e minerais entre **R$ 0,30/L e R$ 3,50/L** |
+| | `cons_hired_labor_cost_liter` | Custo da mão de obra contratada **< R$ 1,00/L** |
+
+### 🏷️ Colunas Geradas no Relatório:
+
+- `consistency_status`: **Consistente** (0 violações) ou **Inconsistente** (1 ou mais violações).
+- `consistency_id`: Identificador numérico (`0` para Consistente, `1` para Inconsistente).
+- `total_consistency_criteria_ok` / `total_consistency_criteria_violated`: Contagem de critérios atendidos e violados.
+- `violated_consistency_criteria`: Relação textual dos critérios violados (ex: `Alimentação/Preço do leite; Custo de concentrado`).
+- `violated_consistency_details`: Detalhamento dos motivos e valores calculados que provocaram a violação (ex: `Alimentação/Preço do leite (Acima do máx >150%: 185.4%)`).
+
+---
+
 ## ⚙️ Configuração
 
 Crie o arquivo `.env` na raiz do projeto com as credenciais necessárias:

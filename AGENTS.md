@@ -85,6 +85,7 @@ Escreva nomes de variáveis, comentários e documentação em português quando 
 - Os arquivos anuais devem ser gravados em `data/outputs/annual/`.
 - Preserve o padrão de nome existente com a data de geração.
 - Não sobrescreva uma exportação histórica sem solicitação explícita.
+- **Arquivos DEMO / Demonstrativos**: Não gere arquivos de demonstração (ex: arquivos com sufixo `DEMO` ou demonstrativos locais) de forma automática. Arquivos de demonstração só devem ser gerados quando o usuário solicitar explicitamente.
 - Mantenha cabeçalhos, tipos e nomes de abas estáveis quando possível.
 - A formatação do Excel não pode alterar os valores calculados.
 
