@@ -28,10 +28,5 @@ SELECT pu.id_property,
 FROM "PropertyUsers" pu
     JOIN "User" u ON u.id_user = pu.id_user
     JOIN "UserType" ut ON ut.id_type = u.id_type
-    JOIN "Property" p ON p.id_property = pu.id_property
-WHERE ut.name = 'Consultor(a)'::text
-  AND pu.return_date IS NULL
-  AND pu."isAssociationApproved" = true
-  AND u."isActive" = true
-  AND p."isActive" = true;
+WHERE ut.name = 'Consultor(a)'::text;
 
