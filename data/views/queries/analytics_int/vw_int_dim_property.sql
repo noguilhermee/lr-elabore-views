@@ -104,4 +104,6 @@ FROM "Property" p
     LEFT JOIN "Entrepreneur" e ON e.id_entrepreneur = p.id_entrepreneur
     LEFT JOIN "Agroindustry" a ON a.id_agroindustry = p.id_agroindustry
     LEFT JOIN latest_land_value llv ON llv.id_property = p.id_property AND llv.rn = 1
-    LEFT JOIN current_consultant cc ON cc.id_property = p.id_property AND cc.rn = 1;
+    LEFT JOIN current_consultant cc ON cc.id_property = p.id_property AND cc.rn = 1
+
+WHERE p."isActive" IS TRUE;
